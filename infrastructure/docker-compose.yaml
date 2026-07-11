@@ -49,5 +49,13 @@ services:
         image: grafana/grafana
         ports:
         - "3000:3000"
+        env_file:
+        -   path: ../.env
+            required: true
+        environment:
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_NAME: ${DB_NAME}
         volumes:
         - ./grafana_data:/var/lib/grafana
+        - ./grafana_provisioning:/etc/grafana/provisioning
