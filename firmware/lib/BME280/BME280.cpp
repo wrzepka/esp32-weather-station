@@ -104,6 +104,34 @@ int32_t BME280::compensate_temperature(int32_t adc_temp) {
     return temp;
 }
 
+uint32_t BME280::compensate_pressure(int32_t adc_p) {
+    int32_t var1, var2;
+    uint32_t press;
+
+    var1 = (this->fine_temp >> 1) - 64000;
+    var2 = ((var1 >> 2) * (var1>>2) >> 11) * this->_calib_data.dig_P6;
+    var2 = var2 + ((var1 * this->_calib_data.dig_P5)<<1);
+    var2 = (var2 >> 2) + (static_cast<int32_t>(this->_calib_data.dig_P4) << 16);
+    var1 = (((this->_calib_data.dig_P3 * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + ((static_cast<int32_t>(this->_calib_data.dig_P2) * var1) >> 1)) >> 18;
+    var1 = ((32768 + var1) * this->_calib_data.dig_P1) >> 15;
+
+    if (var1 == 0) {
+        return 0;
+    }
+    press = ((1048576 - adc_p) - (var2>>12))*3125;
+    if (press < 0x80000000) {
+        press = (press << 1) / var1;
+    } else {
+        press = (press / var1) * 2;
+    }
+
+    var1 = ((static_cast<int32_t>(this->_calib_data.dig_P9) * (static_cast<int32_t>((press>>3) * (press>>3)) >> 13))) >> 12;
+    var2 = (static_cast<int32_t>(press>>2) * static_cast<int32_t>(this->_calib_data.dig_P8)) >> 13;
+
+    press = static_cast<uint32_t>(static_cast<int32_t>(press) + ((var1 + var2 + this->_calib_data.dig_P7) >> 4));
+    return press;
+}
+
 bool BME280::read_weather_data() {
     uint8_t reg_address = 0xF7;
     uint8_t data[8] = {0};
@@ -116,16 +144,15 @@ bool BME280::read_weather_data() {
 
     int32_t adc_T, adc_P, adc_H;
 
-    // adc_P = (data[0] << 12) | (data[1] << 4) | ((data[2] >> 4));
-
-    //TODO: Pressure compensation
-
     adc_T = (data[3] << 12) | (data[4] << 4) | ((data[5] >> 4));
-
     int32_t T = compensate_temperature(adc_T);
+
+    adc_P = (data[0] << 12) | (data[1] << 4) | ((data[2] >> 4));
+    uint32_t P = compensate_pressure(adc_P);
 
     //TEMPORARY SOLUTION
     ESP_LOGI("BME280", "Temperature: %d", T);
+    ESP_LOGI("BME280", "Pressure: %u", P);
 
     // adc_H = (data[6] << 8) | (data[7]);
 
