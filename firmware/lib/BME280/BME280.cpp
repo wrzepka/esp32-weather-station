@@ -152,6 +152,27 @@ uint32_t BME280::compensate_pressure(int32_t adc_p) {
     return press;
 }
 
+uint32_t BME280::compensate_humidity(int32_t adc_H) {
+    int32_t v_x1;
+
+    v_x1 = (this->fine_temp - static_cast<int32_t>(76800));
+
+    v_x1 = (((((adc_H << 14) - (((int32_t)this->_calib_data.dig_H4) << 20) -
+        (((int32_t)this->_calib_data.dig_H5) * v_x1)) + ((int32_t)16384)) >> 15) *
+            (((((((v_x1 * ((int32_t)this->_calib_data.dig_H6)) >> 10) *
+                (((v_x1 * ((int32_t)this->_calib_data.dig_H3)) >> 11) +
+                    ((int32_t)32768))) >> 10) + ((int32_t)2097152)) *
+                    ((int32_t)this->_calib_data.dig_H2) + 8192) >> 14));
+
+
+    v_x1 = (v_x1 - (((((v_x1 >> 15) * (v_x1 >> 15)) >> 7) * (static_cast<int32_t>(this->_calib_data.dig_H1))) >> 4));
+
+    v_x1 = (v_x1 < 0 ? 0 : v_x1);
+    v_x1 = (v_x1 > 419430400 ? 419430400 : v_x1);
+
+    return static_cast<uint32_t>(v_x1 >> 12);
+}
+
 bool BME280::read_weather_data() {
     uint8_t transmit_data[2] = {0xF4, 0x25};
     i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data), -1);
@@ -172,17 +193,18 @@ bool BME280::read_weather_data() {
     adc_T = (data[3] << 12) | (data[4] << 4) | ((data[5] >> 4));
     int32_t T = compensate_temperature(adc_T);
 
+    adc_H = (data[6] << 8) | (data[7]);
+    uint32_t H = compensate_humidity(adc_H); // need to divide by 1024 to get Q22.10 format
+
     // THIS IS ABSOLUTE PRESSURE
     adc_P = (data[0] << 12) | (data[1] << 4) | ((data[2] >> 4));
     uint32_t P = compensate_pressure(adc_P);
 
+
     //TEMPORARY SOLUTION
     ESP_LOGI("BME280", "Temperature: %d", T);
     ESP_LOGI("BME280", "Pressure: %u", P);
-
-    // adc_H = (data[6] << 8) | (data[7]);
-
-    //TODO: Humidity compensation
+    ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
 
     return true;
 }

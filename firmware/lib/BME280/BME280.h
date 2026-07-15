@@ -62,6 +62,7 @@ public:
     void print_calib_data() const;
     int32_t compensate_temperature(int32_t adc_temp);
     uint32_t compensate_pressure(int32_t adc_press);
+    uint32_t compensate_humidity(int32_t adc_H);
     bool read_weather_data();
 private:
     uint8_t _address;
