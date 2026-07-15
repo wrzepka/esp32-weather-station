@@ -157,12 +157,12 @@ uint32_t BME280::compensate_humidity(int32_t adc_H) {
 
     v_x1 = (this->fine_temp - static_cast<int32_t>(76800));
 
-    v_x1 = (((((adc_H << 14) - (((int32_t)this->_calib_data.dig_H4) << 20) -
-        (((int32_t)this->_calib_data.dig_H5) * v_x1)) + ((int32_t)16384)) >> 15) *
-            (((((((v_x1 * ((int32_t)this->_calib_data.dig_H6)) >> 10) *
-                (((v_x1 * ((int32_t)this->_calib_data.dig_H3)) >> 11) +
-                    ((int32_t)32768))) >> 10) + ((int32_t)2097152)) *
-                    ((int32_t)this->_calib_data.dig_H2) + 8192) >> 14));
+    v_x1 = (((((adc_H << 14) - (static_cast<int32_t>(this->_calib_data.dig_H4) << 20) -
+        (static_cast<int32_t>(this->_calib_data.dig_H5) * v_x1)) + static_cast<int32_t>(16384)) >> 15) *
+            (((((((v_x1 * static_cast<int32_t>(this->_calib_data.dig_H6)) >> 10) *
+                (((v_x1 * static_cast<int32_t>(this->_calib_data.dig_H3)) >> 11) +
+                    static_cast<int32_t>(32768))) >> 10) + static_cast<int32_t>(2097152)) *
+                    static_cast<int32_t>(this->_calib_data.dig_H2) + 8192) >> 14));
 
 
     v_x1 = (v_x1 - (((((v_x1 >> 15) * (v_x1 >> 15)) >> 7) * (static_cast<int32_t>(this->_calib_data.dig_H1))) >> 4));
