@@ -50,6 +50,8 @@ class WiFiManager {
      * for work in STATION MODE.
      */
     void init_wifi_station();
+
+    void set_static_ip();
 };
 
 

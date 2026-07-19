@@ -83,7 +83,7 @@ void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
-        //TODO: STATIC IP
+        wifi_manager->set_static_ip();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         // auto* disconnected_data = static_cast<wifi_event_sta_disconnected_t*>(event_data);
         // while (true) {
@@ -103,3 +103,23 @@ void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int
         xEventGroupSetBits(wifi_manager->_s_network_event_group, BIT0);
     }
 }
+
+void WiFiManager::set_static_ip() {
+    if (esp_netif_dhcpc_stop(this->_sta_netif) != ESP_OK) {
+        ESP_LOGE("WIFI", "Failed to stop DHCP server");
+        return;
+    }
+
+    esp_netif_ip_info_t ip_info = {};
+    esp_netif_str_to_ip4("10.246.161.67", &ip_info.ip);
+    esp_netif_str_to_ip4("255.255.255.0", &ip_info.netmask);
+    esp_netif_str_to_ip4("10.246.161.1", &ip_info.gw);
+
+    if (esp_netif_set_ip_info(this->_sta_netif, &ip_info) != ESP_OK) {
+        ESP_LOGE("WIFI", "Failed to set ip info");
+        return;
+    }
+
+    ESP_LOGI("WIFI", "Successfully set up static ip.");
+}
+
