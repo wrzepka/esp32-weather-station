@@ -200,7 +200,7 @@ esp_err_t BME280::read_weather_data() {
 
     vTaskDelay(pdMS_TO_TICKS(SUITABLE_MEASUREMENT_DELAY_IN_MS));
 
-    uint8_t data[8] = {0};
+    uint8_t data[MEAS_DATA_PAYLOAD_SIZE] = {0};
 
     result = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
                                                 sizeof(REG_MEAS_DATA_START_ADDR), data, MEAS_DATA_PAYLOAD_SIZE,
