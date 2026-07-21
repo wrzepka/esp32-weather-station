@@ -10,7 +10,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-bool BME280::begin(i2c_master_bus_handle_t bus_handle) {
+esp_err_t BME280::begin(i2c_master_bus_handle_t bus_handle) {
+    if (bus_handle == nullptr) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
     const i2c_device_config_t dev_config = {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
         .device_address = _address,
@@ -19,46 +23,54 @@ bool BME280::begin(i2c_master_bus_handle_t bus_handle) {
         .flags = {},
     };
 
-    if (i2c_master_bus_add_device(bus_handle, &dev_config, &this->_dev_handle) == ESP_OK) {
-        bme_280_hum_meas hum_meas = {
-            .fields = {.osrs_h = 1, .RESERVED = 0}
-        };
-
-        bme_280_ctrl_meas ctrl_meas = {
-            .fields = {
-                .mode = 0,
-                .osrs_p = 1,
-                .osrs_t = 1,
-            }
-        };
-
-        uint8_t transmit_data[2] = {REG_CONTROL_HUM_ADDR, hum_meas.raw};
-        i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
-                            pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
-        transmit_data[0] = REG_CONTROL_MEAS_ADDR;
-        transmit_data[1] = ctrl_meas.raw;
-        i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
-                            pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
-
-        return true;
+    esp_err_t result = i2c_master_bus_add_device(bus_handle, &dev_config, &this->_dev_handle);
+    if (result != ESP_OK) {
+        return result;
     }
-    return false;
+
+    bme_280_hum_meas hum_meas = {
+        .fields = {.osrs_h = 1, .RESERVED = 0}
+    };
+
+    bme_280_ctrl_meas ctrl_meas = {
+        .fields = {
+            .mode = 0,
+            .osrs_p = 1,
+            .osrs_t = 1,
+        }
+    };
+
+    uint8_t transmit_data[2] = {REG_CONTROL_HUM_ADDR, hum_meas.raw};
+    result = i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
+                                 pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
+    }
+
+    transmit_data[0] = REG_CONTROL_MEAS_ADDR;
+    transmit_data[1] = ctrl_meas.raw;
+    result = i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
+                                 pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
+    }
+
+    return ESP_OK;
 }
 
 const BME280::bme280_calib_data &BME280::calib_data() const {
     return _calib_data;
 }
 
-bool BME280::read_calib_data() {
+esp_err_t BME280::read_calib_data() {
     uint8_t data[CALIB_00_PAYLOAD_SIZE] = {0};
 
-    esp_err_t err = i2c_master_transmit_receive(this->_dev_handle, &REG_CALIB_00_ADDR, sizeof(REG_CALIB_00_ADDR), data,
-                                                CALIB_00_PAYLOAD_SIZE, pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
-    if (err != ESP_OK) {
-        gpio_set_level(GPIO_NUM_15, 1);
-        return false;
+    esp_err_t result = i2c_master_transmit_receive(this->_dev_handle, &REG_CALIB_00_ADDR, sizeof(REG_CALIB_00_ADDR),
+                                                   data,
+                                                   CALIB_00_PAYLOAD_SIZE, pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
     }
-
 
     this->_calib_data.dig_T1 = data[0] | (data[1] << 8);
     this->_calib_data.dig_T2 = static_cast<int16_t>(data[2] | (data[3] << 8));
@@ -76,11 +88,10 @@ bool BME280::read_calib_data() {
 
     this->_calib_data.dig_H1 = data[25];
 
-    err = i2c_master_transmit_receive(this->_dev_handle, &REG_CALIB_26_ADDR, sizeof(REG_CALIB_26_ADDR), data,
-                                      CALIB_26_PAYLOAD_SIZE, pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
-    if (err != ESP_OK) {
-        gpio_set_level(GPIO_NUM_15, 1);
-        return false;
+    result = i2c_master_transmit_receive(this->_dev_handle, &REG_CALIB_26_ADDR, sizeof(REG_CALIB_26_ADDR), data,
+                                         CALIB_26_PAYLOAD_SIZE, pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
     }
 
     this->_calib_data.dig_H2 = static_cast<int16_t>(data[0] | (data[1] << 8));
@@ -91,7 +102,8 @@ bool BME280::read_calib_data() {
     this->_calib_data.dig_H5 = static_cast<int16_t>((data[4] >> 4) | (data[5] << 4));
     if (this->_calib_data.dig_H5 & 0x800) this->_calib_data.dig_H5 |= static_cast<int16_t>(0xF000);
     this->_calib_data.dig_H6 = static_cast<int8_t>(data[6]);
-    return true;
+
+    return ESP_OK;
 }
 
 void BME280::print_calib_data() const {
@@ -178,21 +190,23 @@ uint32_t BME280::compensate_humidity(int32_t adc_H) {
     return static_cast<uint32_t>(v_x1 >> 12);
 }
 
-bool BME280::read_weather_data() {
+esp_err_t BME280::read_weather_data() {
     uint8_t transmit_data[2] = {REG_CONTROL_MEAS_ADDR, 0x25};
-    i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
-                        pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    esp_err_t result = i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
+                                           pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
+    }
 
     vTaskDelay(pdMS_TO_TICKS(SUITABLE_MEASUREMENT_DELAY_IN_MS));
 
     uint8_t data[8] = {0};
 
-    esp_err_t err = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
+    result = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
                                                 sizeof(REG_MEAS_DATA_START_ADDR), data, MEAS_DATA_PAYLOAD_SIZE,
                                                 pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
-    if (err != ESP_OK) {
-        gpio_set_level(GPIO_NUM_15, 1);
-        return false;
+    if (result != ESP_OK) {
+        return result;
     }
 
     int32_t adc_T, adc_P, adc_H;
@@ -213,5 +227,5 @@ bool BME280::read_weather_data() {
     ESP_LOGI("BME280", "Pressure: %u", P);
     ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
 
-    return true;
+    return ESP_OK;
 }

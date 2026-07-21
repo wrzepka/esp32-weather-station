@@ -13,6 +13,7 @@
 
 #ifndef FIRMWARE_BME280_H
 #define FIRMWARE_BME280_H
+#include <esp_err.h>
 #include <driver/i2c_types.h>
 
 /**
@@ -89,7 +90,7 @@ public:
      * @param bus_handle I2C master bus handle.
      * @return false when initialization failed, otherwise true.
      */
-    bool begin(i2c_master_bus_handle_t bus_handle);
+    esp_err_t begin(i2c_master_bus_handle_t bus_handle);
 
     /**
      * @brief Reads calibration data from BME280 registers.
@@ -98,7 +99,7 @@ public:
      *
      * @return false when read failed, otherwise true.
      */
-    bool read_calib_data();
+    esp_err_t read_calib_data();
 
     /**
      * @brief Gives access to private _calib_data field.
@@ -149,7 +150,7 @@ public:
      *
      * @return false when read failed, otherwise true.
      */
-    bool read_weather_data();
+    esp_err_t read_weather_data();
 
 private:
     uint8_t _address; /**< Device I2C address (default: 0x76 or 0x77 if specified pin is high) */
