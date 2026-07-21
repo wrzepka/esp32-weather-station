@@ -10,6 +10,7 @@
 
 #ifndef FIRMWARE_BH1750_H
 #define FIRMWARE_BH1750_H
+#include <esp_err.h>
 #include <driver/i2c_types.h>
 
 /**
@@ -40,19 +41,23 @@ public:
      * Configures device handler and adds it to the I2C bus.
      *
      * @param bus_handle I2C master bus handle.
-     * @return false when initialization failed, otherwise true.
+     * @return ESP_ERR_INVALID_ARG if bus handle is nullptr.
+     * @return ESP_OK if initialization succeed.
+     * @return Other esp errors if something went wrong.
      */
-    bool begin(i2c_master_bus_handle_t bus_handle);
+    esp_err_t begin(i2c_master_bus_handle_t bus_handle);
 
     /**
-     * @brief Reads light intensity and returns it
+     * @brief Makes light intensity measurement.
      *
-     * Starts one-time measurement, waits 180ms and reads raw value. After adding bytes and dividing by 1.2 returns proper
-     * value.
+     * Demands measurement start via I2C bus. Receives data, divides it by 1.2 (MEASURE_RATIO) and saves it
+     * inside of light_intensity.
      *
-     * @return Unsigned integer illuminance value in lux (lx).
+     * @param[out] light_intensity Reference for storing the final illuminance value in lux
+     * @return ESP_OK if measurement succeed.
+     * @return Other esp errors if something went wrong.
      */
-    uint32_t read_light_intensity();
+    esp_err_t read_light_intensity(uint32_t &light_intensity);
 };
 
 #endif //FIRMWARE_BH1750_H
