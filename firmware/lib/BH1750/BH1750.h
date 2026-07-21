@@ -22,7 +22,7 @@
  */
 class BH1750 {
 public:
-    static constexpr uint8_t DEFAULT_I2C_ADDRESS = 0x20; /**< Default I2C address for BH1750 sensor.*/
+    static constexpr uint8_t DEFAULT_I2C_ADDRESS = 0x23; /**< Default I2C address for BH1750 sensor.*/
     static constexpr uint8_t SECONDARY_I2C_ADDRESS = 0x5c; /**< Secondary I2C address for BH1750 sensor if ADDR is HIGH.*/
 private:
     uint8_t m_address; /**< I2C device address*/
