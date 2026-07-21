@@ -14,7 +14,7 @@
 
 #define BLINK_GPIO GPIO_NUM_15
 
-void init_i2c();
+esp_err_t init_i2c();
 void i2c_scanner(i2c_master_bus_handle_t bus_handle);
 
 static const char *TAG = "FireBeetle 2 ESP32-C6 Weather Station";
@@ -23,42 +23,45 @@ extern "C" void app_main(void) {
     gpio_reset_pin(BLINK_GPIO);
     gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
-    init_i2c();
+    ESP_ERROR_CHECK(init_i2c());
     i2c_master_bus_handle_t i2c_bus_handle;
     i2c_master_get_bus_handle(I2C_NUM_0, &i2c_bus_handle);
 
-    BH1750 *light_intensity_sensor = new BH1750();
-    BME280 *temperature_sensor = new BME280();
-    WiFiManager *wifi_manager = new WiFiManager();
+    auto *bh1750 = new BH1750();
+    auto *bme280 = new BME280();
+    auto *wifi_manager = new WiFiManager();
 
     uint8_t led_state = 0;
-
+    uint32_t light_intensity = 0;
     wifi_manager->init_wifi_station();
-
-    light_intensity_sensor->begin(i2c_bus_handle);
-    temperature_sensor->begin(i2c_bus_handle);
-
-    temperature_sensor->read_calib_data();
+    ESP_ERROR_CHECK(bh1750->begin(i2c_bus_handle));
+    BME280::Config bme280_config = {};
+    ESP_ERROR_CHECK(bme280->begin(i2c_bus_handle, bme280_config));
 
     while (true) {
         i2c_scanner(i2c_bus_handle);
 
         led_state = !led_state;
-        // gpio_set_level(BLINK_GPIO, led_state);
+        gpio_set_level(BLINK_GPIO, led_state);
 
-        uint32_t result = light_intensity_sensor->read_light_intensity();
+        esp_err_t result = bh1750->read_light_intensity(light_intensity);
 
-        ESP_LOGI(TAG, "LED: %s", (led_state == 1 ? "ON" : "OFF"));
-        ESP_LOGI(TAG, "ILLUMINANCE: %u", result);
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to read light intensity: %s", esp_err_to_name(result));
+        }else {
+            ESP_LOGI(TAG, "ILLUMINANCE: %u", light_intensity);
+        }
 
-        temperature_sensor->read_weather_data();
-        // temperature_sensor->print_calib_data();
+        result = bme280->read_weather_data();
+        if (result != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to read BME280 sensor data: %s", esp_err_to_name(result));
+        }
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
-void init_i2c() {
+esp_err_t init_i2c() {
     i2c_master_bus_handle_t bus_handle;
 
     constexpr i2c_master_bus_config_t bus_config = {
@@ -72,7 +75,7 @@ void init_i2c() {
         .flags = {},
     };
 
-    ESP_ERROR_CHECK(i2c_new_master_bus(&bus_config, &bus_handle));
+    return i2c_new_master_bus(&bus_config, &bus_handle);
 }
 
 void i2c_scanner(i2c_master_bus_handle_t bus_handle) {
