@@ -50,8 +50,8 @@ esp_err_t WiFiManager::init_wifi_station() {
     if (result != ESP_OK) return result;
 
     wifi_config_t wifi_config = {};
-    strlcpy(reinterpret_cast<char *>(wifi_config.sta.ssid), "PocoF5", sizeof(wifi_config.sta.ssid));
-    strlcpy(reinterpret_cast<char *>(wifi_config.sta.password), "12345678", sizeof(wifi_config.sta.password));
+    strlcpy(reinterpret_cast<char *>(wifi_config.sta.ssid), WIFI_SSID, sizeof(wifi_config.sta.ssid));
+    strlcpy(reinterpret_cast<char *>(wifi_config.sta.password), WIFI_PASSWORD, sizeof(wifi_config.sta.password));
     wifi_config.sta.scan_method = WIFI_FAST_SCAN;
     wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
 
@@ -61,15 +61,15 @@ esp_err_t WiFiManager::init_wifi_station() {
 
     EventBits_t bits = xEventGroupWaitBits(
         this->_s_network_event_group,
-        BIT0 | BIT1,
+        WIFI_CONNECTED_BIT | WIFI_DISCONNECTED_BIT,
         pdFALSE,
         pdFALSE,
-        pdMS_TO_TICKS(5000));
+        pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
     if ((result = esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, this->_instance_got_ip)) != ESP_OK) return result;
     if ((result = esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, this->_instance_any_id)) != ESP_OK) return result;
 
-    if (bits & BIT0) {
+    if (bits & WIFI_CONNECTED_BIT) {
         return ESP_OK;
     }
     return ESP_ERR_TIMEOUT;
@@ -89,17 +89,17 @@ void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int
         //     ESP_LOGE("WIFI_ERROR", "%d", disconnected_data->reason);
         // }
 
-        if (s_retry_num < 5) {
+        if (s_retry_num < MAX_RETRY) {
             esp_wifi_connect();
             s_retry_num++;
             ESP_LOGI("WIFI", "retry to connect to the AP");
         } else {
-            xEventGroupSetBits(wifi_manager->_s_network_event_group, BIT1);
+            xEventGroupSetBits(wifi_manager->_s_network_event_group, WIFI_DISCONNECTED_BIT);
         }
         ESP_LOGI("WIFI", "connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         s_retry_num = 0;
-        xEventGroupSetBits(wifi_manager->_s_network_event_group, BIT0);
+        xEventGroupSetBits(wifi_manager->_s_network_event_group, WIFI_CONNECTED_BIT);
     }
 }
 
@@ -111,9 +111,9 @@ esp_err_t WiFiManager::set_static_ip() {
 
     esp_netif_ip_info_t ip_info = {};
     esp_err_t address_err = ESP_OK;
-    address_err |= esp_netif_str_to_ip4("10.246.161.67", &ip_info.ip);
-    address_err |= esp_netif_str_to_ip4("255.255.255.0", &ip_info.netmask);
-    address_err |= esp_netif_str_to_ip4("10.246.161.1", &ip_info.gw);
+    address_err |= esp_netif_str_to_ip4(STATION_IP, &ip_info.ip);
+    address_err |= esp_netif_str_to_ip4(STATION_NETMASK, &ip_info.netmask);
+    address_err |= esp_netif_str_to_ip4(STATION_GATEWAY, &ip_info.gw);
     if (address_err != ESP_OK) {
         return ESP_ERR_INVALID_ARG;
     }

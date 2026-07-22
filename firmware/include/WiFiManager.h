@@ -25,7 +25,15 @@ class WiFiManager {
     esp_event_handler_instance_t _instance_any_id; /**< Handle for WiFi types events*/
     esp_event_handler_instance_t _instance_got_ip; /**< Handle for IP types events*/
     EventGroupHandle_t _s_network_event_group; /**< Handle for network event group*/
-
+    static constexpr auto WIFI_SSID = "PocoF5";
+    static constexpr auto WIFI_PASSWORD = "12345678";
+    static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;
+    static constexpr uint8_t WIFI_CONNECTED_BIT = BIT0;
+    static constexpr uint8_t WIFI_DISCONNECTED_BIT = BIT1;
+    static constexpr uint8_t MAX_RETRY = 5;
+    static constexpr auto STATION_IP = "10.246.161.67";
+    static constexpr auto STATION_NETMASK = "255.255.255.0";
+    static constexpr auto STATION_GATEWAY = "10.246.161.1";
     public:
     WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr), _s_network_event_group(nullptr) {};
 
