@@ -21,19 +21,19 @@
  */
 class WiFiManager {
     private:
-    esp_netif_t *_sta_netif; /**< Pointer to station network interface handle*/
-    esp_event_handler_instance_t _instance_any_id; /**< Handle for WiFi types events*/
-    esp_event_handler_instance_t _instance_got_ip; /**< Handle for IP types events*/
-    EventGroupHandle_t _s_network_event_group; /**< Handle for network event group*/
-    static constexpr auto WIFI_SSID = "PocoF5";
-    static constexpr auto WIFI_PASSWORD = "12345678";
-    static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;
-    static constexpr uint8_t WIFI_CONNECTED_BIT = BIT0;
-    static constexpr uint8_t WIFI_DISCONNECTED_BIT = BIT1;
-    static constexpr uint8_t MAX_RETRY = 5;
-    static constexpr auto STATION_IP = "10.246.161.67";
-    static constexpr auto STATION_NETMASK = "255.255.255.0";
-    static constexpr auto STATION_GATEWAY = "10.246.161.1";
+    esp_netif_t *_sta_netif; /**< Pointer to station network interface handle.*/
+    esp_event_handler_instance_t _instance_any_id; /**< Handle for Wi-Fi types events.*/
+    esp_event_handler_instance_t _instance_got_ip; /**< Handle for IP types events.*/
+    EventGroupHandle_t _s_network_event_group; /**< Handle for network event group.*/
+    static constexpr auto WIFI_SSID = "PocoF5"; /**< SSID of used Wi-Fi network.*/
+    static constexpr auto WIFI_PASSWORD = "12345678"; /**< Password of used Wi-Fi network.*/
+    static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000 /**< Max waiting time for response from EventGroup functions.*/;
+    static constexpr uint8_t WIFI_CONNECTED_BIT = BIT0; /**< BIT standing for successful connection*/
+    static constexpr uint8_t WIFI_DISCONNECTED_BIT = BIT1; /**< BIT standing for disconnection*/
+    static constexpr uint8_t MAX_RETRY = 5; /** Amount of Wi-Fi reconnect tries*/
+    static constexpr auto STATION_IP = "10.246.161.67"; /** Local IP address of this station*/
+    static constexpr auto STATION_NETMASK = "255.255.255.0"; /** Network mask of this station's network*/
+    static constexpr auto STATION_GATEWAY = "10.246.161.1"; /** Gateway of this station's network*/
     public:
     WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr), _s_network_event_group(nullptr) {};
 
@@ -55,7 +55,10 @@ class WiFiManager {
      * @brief Initializes and configures Wi-Fi module.
      *
      * Creates and uses handles for network interface, events and event group. Next setups wi-fi module
-     * for work in STATION MODE.
+     * for work in STATION MODE with static IP.
+     *
+     * @return ESP_OK if initialization succeed.
+     * @return Other esp errors if something went wrong.
      */
     esp_err_t init_wifi_station();
 
@@ -64,6 +67,9 @@ class WiFiManager {
      *
      * Stops _sta_netif DHCP. Next initializes and setup esp_netif_ip_info_t structure and set it up to _sta_netif.
      * This method is created for lowering power usage by the ESP32.
+     *
+     * @return ESP_OK if initialization succeed.
+     * @return Other esp errors if something went wrong.
      */
     esp_err_t set_static_ip();
 };
