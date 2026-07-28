@@ -5,7 +5,7 @@
 #ifndef FIRMWARE_MQTTTRANSPORT_H
 #define FIRMWARE_MQTTTRANSPORT_H
 #include <esp_event_base.h>
-
+#include "mqtt5_client.h"
 #include "ITelemetryTransport.h"
 
 /**

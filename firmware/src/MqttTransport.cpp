@@ -3,7 +3,7 @@
 //
 
 #include "MqttTransport.h"
-#include "../esp-mqtt-1.0.0/include/mqtt5_client.h"
+#include "mqtt5_client.h"
 
 
 esp_err_t MqttTransport::connect() {
@@ -20,7 +20,7 @@ esp_err_t MqttTransport::connect() {
     this->m_client = client;
 
     esp_err_t result = ESP_OK;
-    result = esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt5_event_handler, this);
+    result = esp_mqtt_client_register_event(client, static_cast<esp_mqtt_event_id_t>(ESP_EVENT_ANY_ID), mqtt5_event_handler, this);
     if (result != ESP_OK) {
         return result;
     }
