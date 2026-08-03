@@ -10,6 +10,9 @@
 #include "nvs_flash.h"
 
 namespace {
+    /**
+     * @brief Auxiliary structure for memory safe EventGroupHandle_t allocation and deallocation.
+     */
     struct EventGroup {
         EventGroupHandle_t handle;
 
