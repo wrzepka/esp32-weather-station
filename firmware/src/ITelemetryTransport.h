@@ -11,11 +11,11 @@ class ITelemetryTransport {
 public:
     virtual ~ITelemetryTransport() = default;
 
-    virtual esp_err_t connect();
+    virtual esp_err_t connect() = 0;
 
-    virtual esp_err_t disconnect();
+    virtual esp_err_t disconnect() = 0;
 
-    virtual esp_err_t publish();
+    virtual esp_err_t publish() = 0;
 };
 
 #endif //FIRMWARE_ITELEMETRYTRANSPORT_H
