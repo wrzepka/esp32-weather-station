@@ -36,7 +36,7 @@ esp_err_t WiFiManager::init_wifi_station() {
     esp_err_t result = ESP_OK;
     if ((result = esp_netif_init()) != ESP_OK) return result;
     if ((result = esp_event_loop_create_default()) != ESP_OK) return result;
-    auto network_even_group = EventGroup();
+    auto network_event_group = EventGroup();
 
     result = nvs_flash_init();
     if (result == ESP_ERR_NVS_NO_FREE_PAGES || result == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -58,7 +58,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         WIFI_EVENT,
         ESP_EVENT_ANY_ID,
         &WiFiManager::wifi_event_handler,
-        network_even_group.handle,
+        network_event_group.handle,
         &this->_instance_any_id);
     if (result != ESP_OK) return result;
 
@@ -66,7 +66,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         IP_EVENT,
         IP_EVENT_STA_GOT_IP,
         &WiFiManager::wifi_event_handler,
-        network_even_group.handle,
+        network_event_group.handle,
         &this->_instance_got_ip);
     if (result != ESP_OK) return result;
 
@@ -82,7 +82,7 @@ esp_err_t WiFiManager::init_wifi_station() {
     if ((result = esp_wifi_start()) != ESP_OK) return result;
 
     EventBits_t bits = xEventGroupWaitBits(
-        network_even_group.handle,
+        network_event_group.handle,
         WIFI_CONNECTED_BIT | WIFI_DISCONNECTED_BIT,
         pdFALSE,
         pdFALSE,
