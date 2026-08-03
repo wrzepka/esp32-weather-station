@@ -9,13 +9,31 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 
+namespace {
+    struct EventGroup {
+        EventGroupHandle_t handle;
+
+        EventGroup() {
+            handle = xEventGroupCreate();
+        }
+
+        ~EventGroup() {
+            if (handle != nullptr) {
+                vEventGroupDelete(handle);
+            }
+        }
+
+        EventGroup(const EventGroup &) = delete;
+        EventGroup &operator=(const EventGroup &) = delete;
+    };
+}
+
 
 esp_err_t WiFiManager::init_wifi_station() {
-    //TODO: FIX MEMORY LEAK (free event group handler)
     esp_err_t result = ESP_OK;
     if ((result = esp_netif_init()) != ESP_OK) return result;
     if ((result = esp_event_loop_create_default()) != ESP_OK) return result;
-    this->_s_network_event_group = xEventGroupCreate();
+    auto network_even_group = EventGroup();
 
     result = nvs_flash_init();
     if (result == ESP_ERR_NVS_NO_FREE_PAGES || result == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -37,7 +55,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         WIFI_EVENT,
         ESP_EVENT_ANY_ID,
         &WiFiManager::wifi_event_handler,
-        this,
+        network_even_group.handle,
         &this->_instance_any_id);
     if (result != ESP_OK) return result;
 
@@ -45,7 +63,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         IP_EVENT,
         IP_EVENT_STA_GOT_IP,
         &WiFiManager::wifi_event_handler,
-        this,
+        network_even_group.handle,
         &this->_instance_got_ip);
     if (result != ESP_OK) return result;
 
@@ -61,7 +79,7 @@ esp_err_t WiFiManager::init_wifi_station() {
     if ((result = esp_wifi_start()) != ESP_OK) return result;
 
     EventBits_t bits = xEventGroupWaitBits(
-        this->_s_network_event_group,
+        network_even_group.handle,
         WIFI_CONNECTED_BIT | WIFI_DISCONNECTED_BIT,
         pdFALSE,
         pdFALSE,
@@ -79,7 +97,7 @@ esp_err_t WiFiManager::init_wifi_station() {
 }
 
 void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
-    WiFiManager *wifi_manager = static_cast<WiFiManager *>(arg);
+    auto s_network_event_group = static_cast<EventGroupHandle_t>(arg);
     static int s_retry_num = 0;
 
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
@@ -95,12 +113,12 @@ void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int
             s_retry_num++;
             ESP_LOGI("WIFI", "retry to connect to the AP");
         } else {
-            xEventGroupSetBits(wifi_manager->_s_network_event_group, WIFI_DISCONNECTED_BIT);
+            xEventGroupSetBits(s_network_event_group, WIFI_DISCONNECTED_BIT);
         }
         ESP_LOGI("WIFI", "connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         s_retry_num = 0;
-        xEventGroupSetBits(wifi_manager->_s_network_event_group, WIFI_CONNECTED_BIT);
+        xEventGroupSetBits(s_network_event_group, WIFI_CONNECTED_BIT);
     }
 }
 
