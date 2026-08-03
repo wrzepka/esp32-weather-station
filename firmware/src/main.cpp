@@ -7,6 +7,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "MqttTransport.h"
 #include "WiFiManager.h"
 #include "driver/i2c_master.h"
 #include "../lib/BH1750/BH1750.h"
@@ -30,14 +31,16 @@ extern "C" void app_main(void) {
     auto *bh1750 = new BH1750();
     auto *bme280 = new BME280();
     auto *wifi_manager = new WiFiManager();
+    auto mqtt_manager = new MqttTransport("10.246.161.98", 1883);
 
     uint8_t led_state = 0;
     uint32_t light_intensity = 0;
-    wifi_manager->init_wifi_station();
     ESP_ERROR_CHECK(bh1750->begin(i2c_bus_handle));
     BME280::Config bme280_config = {};
     ESP_ERROR_CHECK(bme280->begin(i2c_bus_handle, bme280_config));
-
+    wifi_manager->init_wifi_station();
+    esp_err_t result = mqtt_manager->connect();
+    ESP_LOGI(TAG, "MQTT: %s", esp_err_to_name(result));
     while (true) {
         i2c_scanner(i2c_bus_handle);
 
@@ -57,7 +60,7 @@ extern "C" void app_main(void) {
             ESP_LOGE(TAG, "Failed to read BME280 sensor data: %s", esp_err_to_name(result));
         }
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
