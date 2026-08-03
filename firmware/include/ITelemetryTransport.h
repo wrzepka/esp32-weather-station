@@ -6,15 +6,35 @@
 #define FIRMWARE_ITELEMETRYTRANSPORT_H
 #include <esp_err.h>
 
-
+/**
+ * @class ITelemetryTransport
+ * @brief Interface for implementing way of transporting weather station telemetry data
+ *
+ * This interface provides methods that must be implemented for some type of transport protocol.
+ */
 class ITelemetryTransport {
 public:
     virtual ~ITelemetryTransport() = default;
 
+    /**
+     * @brief Establishes connection with remote server/broker.
+     *
+     * @return ESP_OK on success, proper esp_err_t otherwise.
+     */
     virtual esp_err_t connect() = 0;
 
+    /**
+     * @brief Closes the connection.
+     *
+     * @return ESP_OK on success, proper esp_err_t otherwise.
+     */
     virtual esp_err_t disconnect() = 0;
 
+    /**
+     * @brief Publishes payload to the destination.
+     *
+     * @return ESP_OK on success, proper esp_err_t otherwise.
+     */
     virtual esp_err_t publish() = 0;
 };
 
