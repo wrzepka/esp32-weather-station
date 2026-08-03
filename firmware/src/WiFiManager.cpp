@@ -106,11 +106,6 @@ void WiFiManager::wifi_event_handler(void *arg, esp_event_base_t event_base, int
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        // auto* disconnected_data = static_cast<wifi_event_sta_disconnected_t*>(event_data);
-        // while (true) {
-        //     ESP_LOGE("WIFI_ERROR", "%d", disconnected_data->reason);
-        // }
-
         if (s_retry_num < MAX_RETRY) {
             esp_wifi_connect();
             s_retry_num++;
