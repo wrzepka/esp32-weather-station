@@ -3,13 +3,21 @@
 //
 
 #include "MqttTransport.h"
-#include "mqtt5_client.h"
+
+#include <esp_log.h>
+
+#include "mqtt_client.h"
+
+static constexpr uint8_t MQTT_DISCONNECTED_BIT = BIT0;
+static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT1;
+static constexpr uint8_t MQTT_ERROR_BIT = BIT2;
 
 
 esp_err_t MqttTransport::connect() {
     esp_mqtt_client_config_t mqtt_cfg = {};
     mqtt_cfg.broker.address.hostname = this->m_brokerIp;
     mqtt_cfg.broker.address.port = this->m_brokerPort;
+    mqtt_cfg.broker.address.transport = MQTT_TRANSPORT_OVER_TCP;
     mqtt_cfg.session.protocol_ver = MQTT_PROTOCOL_V_5;
     mqtt_cfg.session.disable_clean_session = false;
 
@@ -25,27 +33,43 @@ esp_err_t MqttTransport::connect() {
         return result;
     }
     result = esp_mqtt_client_start(client);
-    //TODO: memory leak fix.
-    //TODO: async control (semaphor?)
-    return result;
+    if (result != ESP_OK) {
+        return result;
+    }
+
+    EventBits_t bits = xEventGroupWaitBits(
+        this->m_even_group_handle,
+        MQTT_PUBLISHED_BIT | MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
+        pdTRUE,
+        pdFALSE,
+        pdMS_TO_TICKS(5000));
+
+    if (bits & MQTT_PUBLISHED_BIT) return ESP_OK;
+    return ESP_FAIL;
 }
 
 void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
     auto mqtt_client = static_cast<MqttTransport *>(handler_args);
-    esp_mqtt_event_id_t event = static_cast<esp_mqtt_event_id_t>(event_id);
+    auto event = static_cast<esp_mqtt_event_t *>(event_data);
 
-    switch (event) {
+
+    switch (static_cast<esp_mqtt_event_id_t>(event_id)) {
         case MQTT_EVENT_CONNECTED:
-            //TODO: Implement
+            ESP_LOGI("MQTT", "MQTT CONNECTED.");
+            mqtt_client->publish();
             break;
         case MQTT_EVENT_PUBLISHED:
-            //TODO: Implement
+            ESP_LOGI("MQTT", "MQTT PUBLISHED.");
+            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_PUBLISHED_BIT);
             break;
         case MQTT_EVENT_DISCONNECTED:
-            //TODO: Implement
+            ESP_LOGI("MQTT", "MQTT DISCONNECTED.");
+            mqtt_client->disconnect();
+            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_DISCONNECTED_BIT);
             break;
         case MQTT_EVENT_ERROR:
-            //TODO: Implement
+            ESP_LOGI("MQTT", "MQTT_EVENT_ERROR: %d", event->msg_id);
+            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_ERROR_BIT);
             break;
         default:
             break;
@@ -53,9 +77,14 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
 }
 
 esp_err_t MqttTransport::disconnect() {
-    return ESP_OK;
+    return esp_mqtt_client_disconnect(this->m_client);
 }
 
 esp_err_t MqttTransport::publish() {
+    int result = esp_mqtt_client_publish(this->m_client, "iot/weather", "test", 0, 1, 0); // WEATHER DATA IN FUTURE
+
+    if (result < 1) {
+        return ESP_FAIL;
+    }
     return ESP_OK;
 }
