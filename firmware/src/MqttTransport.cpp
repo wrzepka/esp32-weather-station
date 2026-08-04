@@ -35,7 +35,7 @@ esp_err_t MqttTransport::connect() {
     }
 
     EventBits_t bits = xEventGroupWaitBits(
-        this->m_even_group_handle,
+        this->m_event_group_handle,
         MQTT_PUBLISHED_BIT | MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
         pdTRUE,
         pdFALSE,
@@ -57,16 +57,16 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
             break;
         case MQTT_EVENT_PUBLISHED:
             ESP_LOGI("MQTT", "MQTT PUBLISHED.");
-            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_PUBLISHED_BIT);
+            xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_PUBLISHED_BIT);
             break;
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI("MQTT", "MQTT DISCONNECTED.");
             mqtt_client->disconnect();
-            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_DISCONNECTED_BIT);
+            xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_DISCONNECTED_BIT);
             break;
         case MQTT_EVENT_ERROR:
             ESP_LOGI("MQTT", "MQTT_EVENT_ERROR: %d", event->msg_id);
-            xEventGroupSetBits(mqtt_client->m_even_group_handle, MQTT_ERROR_BIT);
+            xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_ERROR_BIT);
             break;
         default:
             break;

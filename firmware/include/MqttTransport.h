@@ -16,7 +16,7 @@ private:
     const char *m_brokerIp;/**<Mqtt broker IP address*/
     uint16_t m_brokerPort;/**< Mqtt broker port (default: 1833)*/
     esp_mqtt_client_handle_t m_client;/**< Mqtt client handle*/
-    EventGroupHandle_t m_even_group_handle;
+    EventGroupHandle_t m_event_group_handle;
     static constexpr uint8_t MQTT_DISCONNECTED_BIT = BIT0;
     static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT1;
     static constexpr uint8_t MQTT_ERROR_BIT = BIT2;
@@ -34,7 +34,7 @@ private:
     static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
 public:
-    MqttTransport(const char *brokerIp, uint16_t brokerPort) : m_brokerIp(brokerIp), m_brokerPort(brokerPort), m_client(nullptr), m_even_group_handle(xEventGroupCreate()) {
+    MqttTransport(const char *brokerIp, uint16_t brokerPort) : m_brokerIp(brokerIp), m_brokerPort(brokerPort), m_client(nullptr), m_event_group_handle(xEventGroupCreate()) {
     };
 
     ~MqttTransport() {
@@ -43,9 +43,9 @@ public:
             esp_mqtt_client_destroy(this->m_client);
             this->m_client = nullptr;
         }
-        if (this->m_even_group_handle != nullptr) {
-            vEventGroupDelete(this->m_even_group_handle);
-            this->m_even_group_handle = nullptr;
+        if (this->m_event_group_handle != nullptr) {
+            vEventGroupDelete(this->m_event_group_handle);
+            this->m_event_group_handle = nullptr;
         }
     }
 
