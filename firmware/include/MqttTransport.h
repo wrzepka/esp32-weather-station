@@ -17,6 +17,12 @@ private:
     uint16_t m_brokerPort;/**< Mqtt broker port (default: 1833)*/
     esp_mqtt_client_handle_t m_client;/**< Mqtt client handle*/
     EventGroupHandle_t m_even_group_handle;
+    static constexpr uint8_t MQTT_DISCONNECTED_BIT = BIT0;
+    static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT1;
+    static constexpr uint8_t MQTT_ERROR_BIT = BIT2;
+    static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000 /**< Max waiting time for response from EventGroup functions.*/;
+    static constexpr auto TOPIC = "iot/weather";
+    static constexpr int QOS = 1;
     /**
      * @brief TODO
      * @param handler_args

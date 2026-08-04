@@ -8,10 +8,6 @@
 
 #include "mqtt_client.h"
 
-static constexpr uint8_t MQTT_DISCONNECTED_BIT = BIT0;
-static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT1;
-static constexpr uint8_t MQTT_ERROR_BIT = BIT2;
-
 
 esp_err_t MqttTransport::connect() {
     esp_mqtt_client_config_t mqtt_cfg = {};
@@ -28,7 +24,8 @@ esp_err_t MqttTransport::connect() {
     this->m_client = client;
 
     esp_err_t result = ESP_OK;
-    result = esp_mqtt_client_register_event(client, static_cast<esp_mqtt_event_id_t>(ESP_EVENT_ANY_ID), mqtt5_event_handler, this);
+    result = esp_mqtt_client_register_event(client, static_cast<esp_mqtt_event_id_t>(ESP_EVENT_ANY_ID),
+                                            mqtt5_event_handler, this);
     if (result != ESP_OK) {
         return result;
     }
@@ -42,7 +39,7 @@ esp_err_t MqttTransport::connect() {
         MQTT_PUBLISHED_BIT | MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
         pdTRUE,
         pdFALSE,
-        pdMS_TO_TICKS(5000));
+        pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
     if (bits & MQTT_PUBLISHED_BIT) return ESP_OK;
     return ESP_FAIL;
@@ -81,7 +78,7 @@ esp_err_t MqttTransport::disconnect() {
 }
 
 esp_err_t MqttTransport::publish() {
-    int result = esp_mqtt_client_publish(this->m_client, "iot/weather", "test", 0, 1, 0); // WEATHER DATA IN FUTURE
+    int result = esp_mqtt_client_publish(this->m_client, TOPIC, "test", 0, QOS, 0); // WEATHER DATA IN FUTURE
 
     if (result < 1) {
         return ESP_FAIL;
