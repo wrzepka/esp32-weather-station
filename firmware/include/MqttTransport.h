@@ -1,7 +1,13 @@
-//
-// Created by Wiktor on 24.07.2026.
-//
-
+/**
+ * @file ITelemetryTransport.h
+ * @author Wiktor
+ * @brief Class for handling message publishing via MQTT.
+ * @date 24.07.2026
+ *
+ * @note Implementation is based on official ESP-IDF examples and documentation:
+ * @see https://github.com/espressif/esp-mqtt/tree/master/examples
+ * @see https://docs.espressif.com/projects/esp-mqtt/en/latest/esp32/#_CPPv420esp_mqtt_transport_t
+ **/
 #ifndef FIRMWARE_MQTTTRANSPORT_H
 #define FIRMWARE_MQTTTRANSPORT_H
 #include <esp_event_base.h>

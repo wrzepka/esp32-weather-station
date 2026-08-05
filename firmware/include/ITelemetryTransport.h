@@ -1,7 +1,9 @@
-//
-// Created by Wiktor on 24.07.2026.
-//
-
+/**
+ * @file ITelemetryTransport.h
+ * @author Wiktor
+ * @brief Interface for declaring methods for transport protocols ex. MQTT.
+ * @date 24.07.2026
+ **/
 #ifndef FIRMWARE_ITELEMETRYTRANSPORT_H
 #define FIRMWARE_ITELEMETRYTRANSPORT_H
 #include <esp_err.h>
