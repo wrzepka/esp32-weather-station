@@ -177,6 +177,17 @@ public:
      */
     esp_err_t read_weather_data();
 
+    /**
+     * TODO: docs
+     * @return
+     */
+    esp_err_t start_measurement();
+
+    /**
+     * TODO: docs
+     * @return
+     */
+    esp_err_t read_measurement();
 private:
     uint8_t _address; /**< Device I2C address (default: 0x76 or 0x77 if specified pin is high).*/
     i2c_master_dev_handle_t _dev_handle; /**< I2C device handle.*/

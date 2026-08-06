@@ -236,3 +236,41 @@ esp_err_t BME280::read_weather_data() {
 
     return ESP_OK;
 }
+
+esp_err_t BME280::start_measurement() {
+    uint8_t transmit_data[2] = {REG_CONTROL_MEAS_ADDR, 0x25};
+    esp_err_t result = i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
+                                           pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    return result;
+}
+
+esp_err_t BME280::read_measurement() {
+    uint8_t data[MEAS_DATA_PAYLOAD_SIZE] = {0};
+
+    esp_err_t result = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
+                                                sizeof(REG_MEAS_DATA_START_ADDR), data, MEAS_DATA_PAYLOAD_SIZE,
+                                                pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
+    if (result != ESP_OK) {
+        return result;
+    }
+
+    int32_t adc_T, adc_P, adc_H;
+
+    adc_T = (data[3] << 12) | (data[4] << 4) | ((data[5] >> 4));
+    int32_t T = compensate_temperature(adc_T);
+
+    adc_H = (data[6] << 8) | (data[7]);
+    uint32_t H = compensate_humidity(adc_H); // need to divide by 1024 to get Q22.10 format
+
+    // THIS IS ABSOLUTE PRESSURE
+    adc_P = (data[0] << 12) | (data[1] << 4) | ((data[2] >> 4));
+    uint32_t P = compensate_pressure(adc_P);
+
+
+    //TEMPORARY SOLUTION
+    ESP_LOGI("BME280", "Temperature: %d", T);
+    ESP_LOGI("BME280", "Pressure: %u", P);
+    ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
+
+    return ESP_OK;
+}
