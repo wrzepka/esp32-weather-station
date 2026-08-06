@@ -23,12 +23,14 @@
 class BH1750 {
 public:
     static constexpr uint8_t DEFAULT_I2C_ADDRESS = 0x23; /**< Default I2C address for BH1750 sensor.*/
-    static constexpr uint8_t SECONDARY_I2C_ADDRESS = 0x5c; /**< Secondary I2C address for BH1750 sensor if ADDR is HIGH.*/
+    static constexpr uint8_t SECONDARY_I2C_ADDRESS = 0x5c;
+    /**< Secondary I2C address for BH1750 sensor if ADDR is HIGH.*/
 private:
     uint8_t m_address; /**< I2C device address*/
     i2c_master_dev_handle_t m_dev_handle; /**< I2C device handle*/
     static constexpr uint8_t ONE_TIME_H_RESOLUTION_MODE = 0x20; /**< Value for high resolution one time measurement*/
-    static constexpr float MEASURE_RATIO = 1.2f; /** Ratio that is used for calculating proper illuminance. Value is from docs.*/
+    static constexpr float MEASURE_RATIO = 1.2f;
+    /** Ratio that is used for calculating proper illuminance. Value is from docs.*/
     static constexpr uint32_t SUITABLE_MEASUREMENT_DELAY_IN_MS = 180; /**< Appropriate delay for proper measurement. */
     static constexpr uint32_t MAX_RESPONSE_TIME_IN_MS = 100; /** Maximum waiting time for response in ms.*/
 public:
@@ -58,6 +60,19 @@ public:
      * @return Other esp errors if something went wrong.
      */
     esp_err_t read_light_intensity(uint32_t &light_intensity);
+
+    /**
+    * TODO: docs
+    * @return
+    */
+    esp_err_t start_measurement();
+
+    /**
+     * TODO: docs
+     * @param light_intensity
+     * @return
+     */
+    esp_err_t read_measurement(uint32_t &light_intensity);
 };
 
 #endif //FIRMWARE_BH1750_H
