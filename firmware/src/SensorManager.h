@@ -14,7 +14,7 @@ private:
 
     public:
         struct Payload {
-            float light_intensity; // TODO: change to uint?
+            uint32_t light_intensity; // TODO: change to uint?
             int32_t temperature;
             uint32_t humidity;
             uint32_t pressure;
