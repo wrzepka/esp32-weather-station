@@ -90,7 +90,7 @@ public:
     };
 
     /**
-     * TODO: docs
+     * @brief Data structure for clear data acquisition.
      */
     struct Data { //TODO: change datatypes? these are too big imo.
         int32_t temperature;
@@ -177,25 +177,40 @@ public:
     uint32_t compensate_humidity(int32_t adc_H);
 
     /**
-     * TODO: update docs
+     * @note Blocking method.
      * @brief Reads ADC values for temperature, pressure and humidity. Compensate them and temporarily LOGs them.
      *
      * Firstly enables BME280 sensor to Force Mode and waits ~10ms to write up conf. Next reads ADC values and
      * compensates them. At the end LOGs them using ESP_LOGI function.
      *
-     * @return false when read failed, otherwise true.
+     * @param[out] data Reference of Data structure, used for storing measurement data.
+     * @return ESP_OK: I2C master transmit success.
+     * @return ESP_ERR_INVALID_RESPONSE: I2C master transmit receives NACK.
+     * @return ESP_ERR_INVALID_ARG: I2C master transmit parameter invalid.
+     * @return ESP_ERR_TIMEOUT: Operation timeout(larger than xfer_timeout_ms) because the bus is busy or hardware crash.
      */
     esp_err_t read_sensor_data_blocking(Data& data);
 
     /**
-     * TODO: docs
-     * @return
+     * @brief Orders sensor to start measurements.
+     *
+     * @return ESP_OK: I2C master transmit success.
+     * @return ESP_ERR_INVALID_RESPONSE: I2C master transmit receives NACK.
+     * @return ESP_ERR_INVALID_ARG: I2C master transmit parameter invalid.
+     * @return ESP_ERR_TIMEOUT: Operation timeout(larger than xfer_timeout_ms) because the bus is busy or hardware crash.
      */
     esp_err_t trigger_measurement();
 
     /**
-     * TODO: docs
-     * @return
+     * @brief Fetches data from sensor registers.
+     *
+     * Reads data, compensates them and saves it via data reference.
+     *
+     * @param[out] data Reference of Data structure, used for storing measurement data.
+     * @return ESP_OK: I2C master transmit success.
+     * @return ESP_ERR_INVALID_RESPONSE: I2C master transmit receives NACK.
+     * @return ESP_ERR_INVALID_ARG: I2C master transmit parameter invalid.
+     * @return ESP_ERR_TIMEOUT: Operation timeout(larger than xfer_timeout_ms) because the bus is busy or hardware crash.
      */
     esp_err_t fetch_measurement(Data& data);
 private:
