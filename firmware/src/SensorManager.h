@@ -19,7 +19,7 @@ private:
         };
 
         SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle);
-        Payload getPayload();
+        esp_err_t getPayload(Payload& payload);
 
 };
 

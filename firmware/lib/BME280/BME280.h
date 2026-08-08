@@ -92,7 +92,7 @@ public:
     /**
      * TODO: docs
      */
-    struct Data {
+    struct Data { //TODO: change datatypes? these are too big imo.
         int32_t temperature;
         uint32_t humidity;
         uint32_t pressure;
