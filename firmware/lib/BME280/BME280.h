@@ -29,7 +29,7 @@ class BME280 {
 public:
     static constexpr uint8_t DEFAULT_I2C_ADDR = 0x76 /**< Default I2C address for BME280 sensor.*/;
     static constexpr uint8_t SECONDARY_I2C_ADDR = 0x77; /**< Secondary I2C address for BME280 sensor.*/;
-
+    static constexpr uint32_t SUITABLE_MEASUREMENT_DELAY_IN_MS = 50; /** Appropriate delay for proper measurement.*/
     /**
      * @brief Contains BME280 calibration data for temperature, pressure and humidity.
      */
@@ -227,7 +227,6 @@ private:
     static constexpr uint8_t CALIB_26_PAYLOAD_SIZE = 7; /** Size of the second part of calib data payload.*/
     static constexpr uint8_t MEAS_DATA_PAYLOAD_SIZE = 8; /** Size of the measurement data payload.*/
     static constexpr uint32_t MAX_RESPONSE_TIME_IN_MS = 100; /** Maximum waiting time for response in ms.*/
-    static constexpr uint32_t SUITABLE_MEASUREMENT_DELAY_IN_MS = 50; /** Appropriate delay for proper measurement.*/
 };
 
 #endif //FIRMWARE_BME280_H

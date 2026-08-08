@@ -3,7 +3,7 @@
 //
 
 #include "SensorManager.h"
-
+#include <algorithm>
 #include "freertos/FreeRTOS.h"
 
 SensorManager::SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle) {
@@ -12,7 +12,7 @@ SensorManager::SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle) {
     this->bme280.begin(i2c_master_bus_handle, bme280_config);
 }
 
-esp_err_t SensorManager::getPayload(Payload& payload) {
+esp_err_t SensorManager::getPayload(Payload &payload) {
     bool bme280_start = false;
     bool bh1750_start = false;
 
@@ -21,7 +21,7 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
 
     if (bme280_start && bh1750_start) return ESP_FAIL;
 
-    vTaskDelay(pdMS_TO_TICKS(180));
+    vTaskDelay(pdMS_TO_TICKS(SensorManager::get_measurement_delay_in_ms()));
 
     bool bme280_measurement = false;
     bool bh1750_measurement = false;
@@ -41,4 +41,8 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
     }
 
     return (bh1750_measurement || bme280_measurement ? ESP_OK : ESP_FAIL);
+}
+
+constexpr uint32_t SensorManager::get_measurement_delay_in_ms() {
+    return std::max({BME280::SUITABLE_MEASUREMENT_DELAY_IN_MS, BH1750::SUITABLE_MEASUREMENT_DELAY_IN_MS,});
 }

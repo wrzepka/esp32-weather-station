@@ -11,7 +11,6 @@ class SensorManager {
 private:
     BME280 bme280;
     BH1750 bh1750;
-
     public:
         struct Payload {
             uint32_t light_intensity;
@@ -20,7 +19,7 @@ private:
 
         SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle);
         esp_err_t getPayload(Payload& payload);
-
+        static constexpr uint32_t get_measurement_delay_in_ms();
 };
 
 #endif //FIRMWARE_SENSORMANAGER_H
