@@ -89,6 +89,15 @@ public:
         Mode mode = Mode::Sleep;
     };
 
+    /**
+     * TODO: docs
+     */
+    struct Data {
+        int32_t temperature;
+        uint32_t humidity;
+        uint32_t pressure;
+    };
+
     BME280(uint8_t address = DEFAULT_I2C_ADDR) : _address(address), _dev_handle(nullptr), _calib_data() {
     };
 
@@ -175,7 +184,7 @@ public:
      *
      * @return false when read failed, otherwise true.
      */
-    esp_err_t read_weather_data();
+    esp_err_t read_weather_data(Data& data);
 
     /**
      * TODO: docs
@@ -187,7 +196,7 @@ public:
      * TODO: docs
      * @return
      */
-    esp_err_t read_measurement();
+    esp_err_t read_measurement(Data& data);
 private:
     uint8_t _address; /**< Device I2C address (default: 0x76 or 0x77 if specified pin is high).*/
     i2c_master_dev_handle_t _dev_handle; /**< I2C device handle.*/

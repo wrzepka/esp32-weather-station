@@ -197,7 +197,7 @@ uint32_t BME280::compensate_humidity(int32_t adc_H) {
     return static_cast<uint32_t>(v_x1 >> 12);
 }
 
-esp_err_t BME280::read_weather_data() {
+esp_err_t BME280::read_weather_data(Data& data) {
     esp_err_t result = start_measurement();
 
     if (result != ESP_OK) {
@@ -206,7 +206,7 @@ esp_err_t BME280::read_weather_data() {
 
     vTaskDelay(pdMS_TO_TICKS(SUITABLE_MEASUREMENT_DELAY_IN_MS));
 
-    return read_measurement();
+    return read_measurement(data);
 }
 
 esp_err_t BME280::start_measurement() {
@@ -216,11 +216,11 @@ esp_err_t BME280::start_measurement() {
     return result;
 }
 
-esp_err_t BME280::read_measurement() {
-    uint8_t data[MEAS_DATA_PAYLOAD_SIZE] = {0};
+esp_err_t BME280::read_measurement(Data& data) {
+    uint8_t read_data[MEAS_DATA_PAYLOAD_SIZE] = {0};
 
     esp_err_t result = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
-                                                sizeof(REG_MEAS_DATA_START_ADDR), data, MEAS_DATA_PAYLOAD_SIZE,
+                                                sizeof(REG_MEAS_DATA_START_ADDR), read_data, MEAS_DATA_PAYLOAD_SIZE,
                                                 pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
     if (result != ESP_OK) {
         return result;
@@ -228,21 +228,21 @@ esp_err_t BME280::read_measurement() {
 
     int32_t adc_T, adc_P, adc_H;
 
-    adc_T = (data[3] << 12) | (data[4] << 4) | ((data[5] >> 4));
-    int32_t T = compensate_temperature(adc_T);
+    adc_T = (read_data[3] << 12) | (read_data[4] << 4) | ((read_data[5] >> 4));
+    data.temperature = compensate_temperature(adc_T);
 
-    adc_H = (data[6] << 8) | (data[7]);
-    uint32_t H = compensate_humidity(adc_H); // need to divide by 1024 to get Q22.10 format
+    adc_H = (read_data[6] << 8) | (read_data[7]);
+    data.humidity = compensate_humidity(adc_H); // need to divide by 1024 to get Q22.10 format
 
     // THIS IS ABSOLUTE PRESSURE
-    adc_P = (data[0] << 12) | (data[1] << 4) | ((data[2] >> 4));
-    uint32_t P = compensate_pressure(adc_P);
+    adc_P = (read_data[0] << 12) | (read_data[1] << 4) | ((read_data[2] >> 4));
+    data.pressure = compensate_pressure(adc_P);
 
 
-    //TEMPORARY SOLUTION
-    ESP_LOGI("BME280", "Temperature: %d", T);
-    ESP_LOGI("BME280", "Pressure: %u", P);
-    ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
+    // //TEMPORARY SOLUTION
+    // ESP_LOGI("BME280", "Temperature: %d", T);
+    // ESP_LOGI("BME280", "Pressure: %u", P);
+    // ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
 
     return ESP_OK;
 }
