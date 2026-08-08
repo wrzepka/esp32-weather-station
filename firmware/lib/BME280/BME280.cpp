@@ -238,11 +238,5 @@ esp_err_t BME280::fetch_measurement(Data& data) {
     adc_P = (read_data[0] << 12) | (read_data[1] << 4) | ((read_data[2] >> 4));
     data.pressure = compensate_pressure(adc_P);
 
-
-    // //TEMPORARY SOLUTION
-    // ESP_LOGI("BME280", "Temperature: %d", T);
-    // ESP_LOGI("BME280", "Pressure: %u", P);
-    // ESP_LOGI("BME280", "Humidity ABS: %u || %.2f%:", H, (static_cast<float>(H)/1024));
-
     return ESP_OK;
 }
