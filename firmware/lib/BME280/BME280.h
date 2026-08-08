@@ -177,6 +177,7 @@ public:
     uint32_t compensate_humidity(int32_t adc_H);
 
     /**
+     * TODO: update docs
      * @brief Reads ADC values for temperature, pressure and humidity. Compensate them and temporarily LOGs them.
      *
      * Firstly enables BME280 sensor to Force Mode and waits ~10ms to write up conf. Next reads ADC values and

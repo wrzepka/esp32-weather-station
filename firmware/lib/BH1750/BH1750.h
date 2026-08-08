@@ -50,6 +50,7 @@ public:
     esp_err_t begin(i2c_master_bus_handle_t bus_handle);
 
     /**
+     * TODO: update docs
      * @brief Makes light intensity measurement.
      *
      * Demands measurement start via I2C bus. Receives data, divides it by 1.2 (MEASURE_RATIO) and saves it
