@@ -47,7 +47,7 @@ extern "C" void app_main(void) {
         led_state = !led_state;
         gpio_set_level(BLINK_GPIO, led_state);
 
-        esp_err_t result = bh1750->read_light_intensity(light_intensity);
+        esp_err_t result = bh1750->read_light_intensity_blocking(light_intensity);
 
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Failed to read light intensity: %s", esp_err_to_name(result));

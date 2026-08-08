@@ -16,7 +16,7 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
     bool bme280_start = false;
     bool bh1750_start = false;
 
-    if (this->bh1750.start_measurement() == ESP_OK) bh1750_start = true;
+    if (this->bh1750.trigger_measurement() == ESP_OK) bh1750_start = true;
     if (this->bme280.start_measurement() == ESP_OK) bme280_start = true;
 
     if (bme280_start && bh1750_start) return ESP_FAIL;
@@ -26,7 +26,7 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
     bool bme280_measurement = false;
     bool bh1750_measurement = false;
 
-    if (bh1750_start && (this->bh1750.read_measurement(payload.light_intensity) == ESP_OK)) {
+    if (bh1750_start && (this->bh1750.fetch_measurement(payload.light_intensity) == ESP_OK)) {
         bh1750_measurement = true;
     } else {
         payload.light_intensity = UINT32_MAX;

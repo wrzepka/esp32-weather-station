@@ -28,23 +28,23 @@ esp_err_t BH1750::begin(i2c_master_bus_handle_t bus_handle) {
     return ESP_OK;
 }
 
-esp_err_t BH1750::read_light_intensity(uint32_t &light_intensity) {
-    esp_err_t result = start_measurement();
+esp_err_t BH1750::read_light_intensity_blocking(uint32_t &light_intensity) {
+    esp_err_t result = trigger_measurement();
     if (result != ESP_OK) {
         return result;
     }
 
     vTaskDelay(pdMS_TO_TICKS(SUITABLE_MEASUREMENT_DELAY_IN_MS));
 
-    return read_measurement(light_intensity);
+    return fetch_measurement(light_intensity);
 }
 
-esp_err_t BH1750::start_measurement() {
+esp_err_t BH1750::trigger_measurement() {
     return i2c_master_transmit(this->m_dev_handle, &ONE_TIME_H_RESOLUTION_MODE, sizeof(uint8_t), pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
 }
 
 
-esp_err_t BH1750::read_measurement(uint32_t &light_intensity) {
+esp_err_t BH1750::fetch_measurement(uint32_t &light_intensity) {
     uint8_t buffer[2] = {0};
 
     esp_err_t result = i2c_master_receive(this->m_dev_handle, buffer, sizeof(buffer), pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));

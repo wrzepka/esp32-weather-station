@@ -60,20 +60,20 @@ public:
      * @return ESP_OK if measurement succeed.
      * @return Other esp errors if something went wrong.
      */
-    esp_err_t read_light_intensity(uint32_t &light_intensity);
+    esp_err_t read_light_intensity_blocking(uint32_t &light_intensity);
 
     /**
     * TODO: docs
     * @return
     */
-    esp_err_t start_measurement();
+    esp_err_t trigger_measurement();
 
     /**
      * TODO: docs
      * @param light_intensity
      * @return
      */
-    esp_err_t read_measurement(uint32_t &light_intensity);
+    esp_err_t fetch_measurement(uint32_t &light_intensity);
 };
 
 #endif //FIRMWARE_BH1750_H
