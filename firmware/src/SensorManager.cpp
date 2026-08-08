@@ -17,7 +17,7 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
     bool bh1750_start = false;
 
     if (this->bh1750.trigger_measurement() == ESP_OK) bh1750_start = true;
-    if (this->bme280.start_measurement() == ESP_OK) bme280_start = true;
+    if (this->bme280.trigger_measurement() == ESP_OK) bme280_start = true;
 
     if (bme280_start && bh1750_start) return ESP_FAIL;
 
@@ -32,7 +32,7 @@ esp_err_t SensorManager::getPayload(Payload& payload) {
         payload.light_intensity = UINT32_MAX;
     }
 
-    if (bme280_start && (this->bme280.read_measurement(payload.bme_data) == ESP_OK)) {
+    if (bme280_start && (this->bme280.fetch_measurement(payload.bme_data) == ESP_OK)) {
         bme280_measurement = true;
     } else {
         payload.bme_data.humidity = UINT32_MAX;

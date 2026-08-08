@@ -197,8 +197,8 @@ uint32_t BME280::compensate_humidity(int32_t adc_H) {
     return static_cast<uint32_t>(v_x1 >> 12);
 }
 
-esp_err_t BME280::read_weather_data(Data& data) {
-    esp_err_t result = start_measurement();
+esp_err_t BME280::read_sensor_data_blocking(Data& data) {
+    esp_err_t result = trigger_measurement();
 
     if (result != ESP_OK) {
         return result;
@@ -206,17 +206,17 @@ esp_err_t BME280::read_weather_data(Data& data) {
 
     vTaskDelay(pdMS_TO_TICKS(SUITABLE_MEASUREMENT_DELAY_IN_MS));
 
-    return read_measurement(data);
+    return fetch_measurement(data);
 }
 
-esp_err_t BME280::start_measurement() {
+esp_err_t BME280::trigger_measurement() {
     uint8_t transmit_data[2] = {REG_CONTROL_MEAS_ADDR, 0x25};
     esp_err_t result = i2c_master_transmit(this->_dev_handle, transmit_data, sizeof(transmit_data),
                                            pdMS_TO_TICKS(MAX_RESPONSE_TIME_IN_MS));
     return result;
 }
 
-esp_err_t BME280::read_measurement(Data& data) {
+esp_err_t BME280::fetch_measurement(Data& data) {
     uint8_t read_data[MEAS_DATA_PAYLOAD_SIZE] = {0};
 
     esp_err_t result = i2c_master_transmit_receive(this->_dev_handle, &REG_MEAS_DATA_START_ADDR,
