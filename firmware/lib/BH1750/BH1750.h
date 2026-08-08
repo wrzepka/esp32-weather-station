@@ -50,10 +50,9 @@ public:
     esp_err_t begin(i2c_master_bus_handle_t bus_handle);
 
     /**
-     * TODO: update docs
-     * @brief Makes light intensity measurement.
+     * @brief Makes a I/O blocking light intensity measurement.
      *
-     * Demands measurement start via I2C bus. Receives data, divides it by 1.2 (MEASURE_RATIO) and saves it
+     * Demands measurement start via I2C bus. Waits SUITABLE_MEASUREMENT_DELAY_IN_MS and then receives data, divides it by 1.2 (MEASURE_RATIO) and saves it
      * inside of light_intensity.
      *
      * @param[out] light_intensity Reference for storing the final illuminance value in lux
@@ -63,15 +62,26 @@ public:
     esp_err_t read_light_intensity_blocking(uint32_t &light_intensity);
 
     /**
-    * TODO: docs
-    * @return
+    * @brief Triggers light intensity measurement.
+    *
+    * Sends order to sensor via I2C protocol to start measure procedure.
+    *
+    * @return ESP_OK: I2C master transmit success.
+    * @return ESP_ERR_INVALID_RESPONSE: I2C master transmit receives NACK.
+    * @return ESP_ERR_INVALID_ARG: I2C master transmit parameter invalid.
+    * @return ESP_ERR_TIMEOUT: Operation timeout(larger than xfer_timeout_ms) because the bus is busy or hardware crash
     */
     esp_err_t trigger_measurement();
 
     /**
-     * TODO: docs
-     * @param light_intensity
-     * @return
+     * @brief Read measurement data from sensor.
+     *
+     * Fetches data from sensor. Divides it by MEASURE_RATIO and then casts it to uint32_t. Finally saves to light_intensity reference.
+     *
+     * @param[out] light_intensity Reference for storing the final illuminance value in lux
+     * @return ESP_OK: I2C master receive success
+     * @return ESP_ERR_INVALID_ARG: I2C master receive parameter invalid.
+     * @return ESP_ERR_TIMEOUT: Operation timeout(larger than xfer_timeout_ms) because the bus is busy or hardware crash
      */
     esp_err_t fetch_measurement(uint32_t &light_intensity);
 };
