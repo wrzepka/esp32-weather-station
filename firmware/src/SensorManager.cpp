@@ -2,7 +2,7 @@
 // Created by Wiktor on 05.08.2026.
 //
 
-#include "SensorManager.h"
+#include "../include/SensorManager.h"
 #include <algorithm>
 #include "freertos/FreeRTOS.h"
 
