@@ -229,10 +229,10 @@ esp_err_t BME280::fetch_measurement(Data& data) {
     int32_t adc_T, adc_P, adc_H;
 
     adc_T = (read_data[3] << 12) | (read_data[4] << 4) | ((read_data[5] >> 4));
-    data.temperature = compensate_temperature(adc_T);
+    data.temperature = static_cast<int16_t>(compensate_temperature(adc_T));
 
     adc_H = (read_data[6] << 8) | (read_data[7]);
-    data.humidity = compensate_humidity(adc_H); // need to divide by 1024 to get Q22.10 format
+    data.humidity = static_cast<uint16_t>((compensate_humidity(adc_H) * 100U) >> 10);
 
     // THIS IS ABSOLUTE PRESSURE
     adc_P = (read_data[0] << 12) | (read_data[1] << 4) | ((read_data[2] >> 4));

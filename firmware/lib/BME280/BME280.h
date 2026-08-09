@@ -92,9 +92,9 @@ public:
     /**
      * @brief Data structure for clear data acquisition.
      */
-    struct Data { //TODO: change datatypes? these are too big imo.
-        int32_t temperature;
-        uint32_t humidity;
+    struct Data {
+        int16_t temperature;
+        uint16_t humidity;
         uint32_t pressure;
     };
 

@@ -35,8 +35,8 @@ esp_err_t SensorManager::getPayload(Payload &payload) {
     if (bme280_start && (this->bme280.fetch_measurement(payload.bme_data) == ESP_OK)) {
         bme280_measurement = true;
     } else {
-        payload.bme_data.humidity = UINT32_MAX;
-        payload.bme_data.temperature = INT32_MAX;
+        payload.bme_data.humidity = UINT16_MAX;
+        payload.bme_data.temperature = INT16_MAX;
         payload.bme_data.pressure = UINT32_MAX;
     }
 
