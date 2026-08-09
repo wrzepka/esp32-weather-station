@@ -25,7 +25,7 @@ public:
      *
      * Initializes all sensors (BH1750, BME280) by using begin() methods.
      *
-     * @param i2c_master_bus_handle
+     * @param i2c_master_bus_handle I2C master bus handle.
      */
     SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle);
 
