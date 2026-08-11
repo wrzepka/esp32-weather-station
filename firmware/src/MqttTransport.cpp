@@ -53,7 +53,7 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
     switch (static_cast<esp_mqtt_event_id_t>(event_id)) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI("MQTT", "MQTT CONNECTED.");
-            mqtt_client->publish();
+            // mqtt_client->publish(); //TODO: remodel it. remove publish from event handler.
             break;
         case MQTT_EVENT_PUBLISHED:
             ESP_LOGI("MQTT", "MQTT PUBLISHED.");

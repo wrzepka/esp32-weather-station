@@ -55,10 +55,10 @@ extern "C" void app_main(void) {
             ESP_LOGI(TAG, "ILLUMINANCE: %u", light_intensity);
         }
 
-        result = bme280->read_weather_data();
-        if (result != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to read BME280 sensor data: %s", esp_err_to_name(result));
-        }
+        // result = bme280->read_weather_data();
+        // if (result != ESP_OK) {
+        //     ESP_LOGE(TAG, "Failed to read BME280 sensor data: %s", esp_err_to_name(result));
+        // }
 
         vTaskDelay(pdMS_TO_TICKS(10000));
     }
