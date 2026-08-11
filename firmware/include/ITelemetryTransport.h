@@ -7,6 +7,7 @@
 #ifndef FIRMWARE_ITELEMETRYTRANSPORT_H
 #define FIRMWARE_ITELEMETRYTRANSPORT_H
 #include <esp_err.h>
+#include <string>
 
 /**
  * @class ITelemetryTransport
@@ -33,11 +34,12 @@ public:
     virtual esp_err_t disconnect() = 0;
 
     /**
+     * TODO: update docs
      * @brief Publishes payload to the destination.
      *
      * @return ESP_OK on success, proper esp_err_t otherwise.
      */
-    virtual esp_err_t publish() = 0;
+    virtual esp_err_t publish(const std::string& serializedPayload) = 0;
 };
 
 #endif //FIRMWARE_ITELEMETRYTRANSPORT_H

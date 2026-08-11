@@ -77,8 +77,8 @@ esp_err_t MqttTransport::disconnect() {
     return esp_mqtt_client_disconnect(this->m_client);
 }
 
-esp_err_t MqttTransport::publish() {
-    int result = esp_mqtt_client_publish(this->m_client, TOPIC, "test", 0, QOS, 0); // WEATHER DATA IN FUTURE
+esp_err_t MqttTransport::publish(const std::string& serializedPayload) {
+    int result = esp_mqtt_client_publish(this->m_client, TOPIC, serializedPayload.c_str(), static_cast<int>(serializedPayload.length()), QOS, 0);
 
     if (result < 1) {
         return ESP_FAIL;

@@ -83,13 +83,14 @@ public:
     esp_err_t disconnect() override;
 
     /**
+     * TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Publish message to the broker.
      *
      * @return ESP_OK if message publishing succeed.
      * @return ESP_FAIL if something went wrong.
      */
-    esp_err_t publish() override;
+    esp_err_t publish(const std::string& serializedPayload) override;
 };
 
 
