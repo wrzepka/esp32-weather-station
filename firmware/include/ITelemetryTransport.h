@@ -36,7 +36,7 @@ public:
     /**
      * @brief Publishes payload to the destination.
      *
-     * @param serializedPayload serialized payload to the string.
+     * @param serializedPayload reference of serialized payload to the string.
      * @return ESP_OK on success, proper esp_err_t otherwise.
      */
     virtual esp_err_t publish(const std::string& serializedPayload) = 0;

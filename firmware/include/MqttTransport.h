@@ -86,7 +86,7 @@ public:
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Publish message to the broker.
      *
-     * @param serializedPayload serialized payload to the string.
+     * @param serializedPayload reference of serialized payload to the string.
      * @return ESP_OK if message publishing succeed.
      * @return ESP_FAIL if something went wrong.
      */
