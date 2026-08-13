@@ -36,12 +36,12 @@ esp_err_t MqttTransport::connect() {
 
     EventBits_t bits = xEventGroupWaitBits(
         this->m_event_group_handle,
-        MQTT_PUBLISHED_BIT | MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
+        MQTT_CONNECTED_BIT | MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
         pdTRUE,
         pdFALSE,
         pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
-    if (bits & MQTT_PUBLISHED_BIT) return ESP_OK;
+    if (bits & MQTT_CONNECTED_BIT) return ESP_OK;
     return ESP_FAIL;
 }
 
@@ -53,7 +53,7 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
     switch (static_cast<esp_mqtt_event_id_t>(event_id)) {
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI("MQTT", "MQTT CONNECTED.");
-            // mqtt_client->publish(); //TODO: remodel it. remove publish from event handler.
+            xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_CONNECTED_BIT);
             break;
         case MQTT_EVENT_PUBLISHED:
             ESP_LOGI("MQTT", "MQTT PUBLISHED.");
@@ -80,8 +80,19 @@ esp_err_t MqttTransport::disconnect() {
 esp_err_t MqttTransport::publish(const std::string& serializedPayload) {
     int result = esp_mqtt_client_publish(this->m_client, TOPIC, serializedPayload.c_str(), static_cast<int>(serializedPayload.length()), QOS, 0);
 
-    if (result < 1) {
+    if (result < 0) {
         return ESP_FAIL;
     }
-    return ESP_OK;
+
+    EventBits_t bits = xEventGroupWaitBits(
+        this->m_event_group_handle,
+        MQTT_PUBLISHED_BIT | MQTT_ERROR_BIT | MQTT_DISCONNECTED_BIT,
+        pdTRUE,
+        pdFALSE,
+        pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
+
+    if (bits & MQTT_PUBLISHED_BIT) {
+        return ESP_OK;
+    }
+    return ESP_FAIL;
 }

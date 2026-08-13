@@ -27,8 +27,9 @@ private:
     esp_mqtt_client_handle_t m_client;/**< Mqtt client handle.*/
     EventGroupHandle_t m_event_group_handle;/**< EventGroup handle.*/
     static constexpr uint8_t MQTT_DISCONNECTED_BIT = BIT0;/**<Bit standing for disconnection.*/
-    static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT1;/**<Bit standing for successful message publication.*/
-    static constexpr uint8_t MQTT_ERROR_BIT = BIT2;/**<Bit standing for some error encounter.*/
+    static constexpr uint8_t MQTT_CONNECTED_BIT = BIT1;/**<Bit standing for connection.*/
+    static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT2;/**<Bit standing for successful message publication.*/
+    static constexpr uint8_t MQTT_ERROR_BIT = BIT3;/**<Bit standing for some error encounter.*/
     static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;/**< Max waiting time for response from EventGroup functions.*/
     static constexpr auto TOPIC = "iot/weather";/**<Topic used for message recognition.*/
     static constexpr int QOS = 1;/**<Level of message's Quality Of Service.*/
@@ -62,6 +63,7 @@ public:
     }
 
     /**
+     * TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Initializes, configures, starts MQTT service.
      *
@@ -83,6 +85,7 @@ public:
     esp_err_t disconnect() override;
 
     /**
+     * TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Publish message to the broker.
      *
