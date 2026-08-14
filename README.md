@@ -27,7 +27,7 @@ A telemetry system based on the ESP32-C6 microcontroller. The system collects en
 ### Phase 2: Edge Layer (ESP32-C6)
 - [x] Initialize ESP-IDF project structure.
 - [x] Write I2C drivers for BME280 and GY-302 sensors.
-- [ ] Implement WiFi connection and MQTT publishing logic.
+- [x] Implement WiFi connection and MQTT publishing logic.
 - [ ] Configure Deep Sleep mode (10-minute cycles).
 
 ### Phase 3: Backend Layer (Java 21 / Spring Boot)
