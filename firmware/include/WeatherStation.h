@@ -21,7 +21,8 @@ class WeatherStation {
 public:
     WeatherStation(i2c_master_bus_handle_t i2c_bus_handle, const char* brokerIp, uint16_t brokerPort): sensor_manager(i2c_bus_handle), mqtt_transport(brokerIp, brokerPort){};
 
-    esp_err_t init();
+    esp_err_t init_sensors();
+    esp_err_t init_communication();
     esp_err_t measure();
     esp_err_t send();
     esp_err_t sleep();

@@ -4,7 +4,12 @@
 
 #include "WeatherStation.h"
 
-esp_err_t WeatherStation::init() {
+esp_err_t WeatherStation::init_sensors() {
+    //TODO: method
+    return ESP_OK;
+};
+
+esp_err_t WeatherStation::init_communication() {
     //TODO: method
     return ESP_OK;
 };
