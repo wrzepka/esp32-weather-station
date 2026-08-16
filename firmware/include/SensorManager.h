@@ -1,12 +1,20 @@
-//
-// Created by Wiktor on 05.08.2026.
-//
-
+/**
+ * @file SensorManager.h
+ * @author Wiktor
+ * @brief Class for handling management of weather station sensors.
+ * @date 05.08.2026
+ **/
 #ifndef FIRMWARE_SENSORMANAGER_H
 #define FIRMWARE_SENSORMANAGER_H
 #include "BH1750.h"
 #include "BME280.h"
 
+/**
+ * @class SensorManager
+ * @brief Class for managing weather station sensors.
+ *
+ * This class provides sensors initialization, measurement triggering and payload creating.
+ */
 class SensorManager {
 private:
     BME280 bme280; /**<Sensor measuring temperature, pressure and humidity.*/
