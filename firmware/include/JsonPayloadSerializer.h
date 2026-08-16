@@ -16,7 +16,7 @@
  *
  * This class provides way o serializing payload to JSON format.
  */
-class JsonPayloadSerializer: public IPayloadSerializer {
+class JsonPayloadSerializer : public IPayloadSerializer {
     /**
      * @brief Serializes payload to JSON format.
      *
@@ -25,5 +25,6 @@ class JsonPayloadSerializer: public IPayloadSerializer {
      * @param payload reference to Payload structure.
      * @return Payload serialized to string in JSON format.
      */
-    std::string serialize(const SensorManager::Payload& payload) override;
+public:
+    std::string serialize(const SensorManager::Payload &payload) override;
 };
