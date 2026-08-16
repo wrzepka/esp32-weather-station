@@ -8,6 +8,7 @@
 #include "cJSON.h"
 #include "../managed_components/espressif__cjson/cJSON/cJSON.h"
 
+//TODO: better memory handling (out of memory, heap fragmentation etc)
 std::string JsonPayloadSerializer::serialize(const SensorManager::Payload& payload) {
     cJSON *object = cJSON_CreateObject();
 
