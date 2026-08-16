@@ -17,6 +17,7 @@
  */
 class SensorManager {
 private:
+    i2c_master_bus_handle_t i2c_bus_handle;
     BME280 bme280; /**<Sensor measuring temperature, pressure and humidity.*/
     BH1750 bh1750; /**<Sensor measuring light intensity.*/
 public:
@@ -29,13 +30,20 @@ public:
     };
 
     /**
+     * TODO: update docs
      * @brief Initializes sensors.
      *
      * Initializes all sensors (BH1750, BME280) by using begin() methods.
      *
      * @param i2c_master_bus_handle I2C master bus handle.
      */
-    SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle);
+    SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle): i2c_bus_handle(i2c_master_bus_handle){};
+
+    /**
+     * TODO: update docs
+     * @return
+     */
+    esp_err_t init_sensors();
 
     /**
      * @brief triggers measurements and then fetches data.

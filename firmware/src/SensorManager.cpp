@@ -6,11 +6,17 @@
 #include <algorithm>
 #include "freertos/FreeRTOS.h"
 
-SensorManager::SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle) {
+esp_err_t SensorManager::init_sensors() {
     BME280::Config bme280_config = {};
-    this->bh1750.begin(i2c_master_bus_handle);
-    this->bme280.begin(i2c_master_bus_handle, bme280_config);
+    esp_err_t init_result = ESP_OK;
+
+    if ((init_result = this->bh1750.begin(this->i2c_bus_handle)) != ESP_OK) {
+        return init_result;
+    }
+
+    return this->bme280.begin(this->i2c_bus_handle, bme280_config);
 }
+
 
 esp_err_t SensorManager::getPayload(Payload &payload) {
     bool bme280_start = false;
