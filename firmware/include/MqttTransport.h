@@ -2,7 +2,7 @@
  * @file ITelemetryTransport.h
  * @author Wiktor
  * @brief Class for handling message publishing via MQTT.
- * @date 24.07.2026
+ * @date 16.08.2026
  *
  * @note Implementation is based on official ESP-IDF examples and documentation:
  * @see https://github.com/espressif/esp-mqtt/tree/master/examples
@@ -63,12 +63,11 @@ public:
     }
 
     /**
-     * TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Initializes, configures, starts MQTT service.
      *
      * Creates handles, configures service for using version 5 of MQTT. Starts service, and then it is waiting for
-     * successful message publishing by utilizing Event Bits.
+     * successful connection with broker.
      *
      * @return ESP_OK if initialization succeed.
      * @return ESP_FAIL if something went wrong.
@@ -85,9 +84,10 @@ public:
     esp_err_t disconnect() override;
 
     /**
-     * TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
-     * @brief Publish message to the broker.
+     * @brief Publishes message to the broker.
+     *
+     * Publishes message to the broker and then waits for MQTT_EVENT_PUBLISHED event.
      *
      * @param serializedPayload reference of serialized payload to the string.
      * @return ESP_OK if message publishing succeed.
