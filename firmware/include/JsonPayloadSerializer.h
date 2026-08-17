@@ -17,15 +17,16 @@
  * This class provides way o serializing payload to JSON format.
  */
 class JsonPayloadSerializer : public IPayloadSerializer {
+public:
     /**
-     * TODO: update docs
      * @brief Serializes payload to JSON format.
      *
      * This method serialize payload data into stringified JSON format using cJSON component.
      *
      * @param payload reference to Payload structure.
-     * @return Payload serialized to string in JSON format.
+     * @param[out] serialize_string reference to serialized string in json format, used further in data transportation.
+     * @return ESP_OK if serialization succeed.
+     * @return ESP_ERR_NO_MEM if there is not enough memory for allocating new cJSON object or raw string.
      */
-public:
-    esp_err_t serialize(const SensorManager::Payload &payload, std::string& serialize_string) override;
+    esp_err_t serialize(const SensorManager::Payload &payload, std::string &serialize_string) override;
 };
