@@ -24,10 +24,9 @@ esp_err_t WeatherStation::measure() {
 }
 
 esp_err_t WeatherStation::send() {
-    JsonPayloadSerializer payload_serializer = JsonPayloadSerializer();
-    std::string json = std::string();
+    JsonPayloadSerializer payload_serializer;
+    std::string json;
 
-    //Here will be some sort of error checking. If serialization succeed :D
     esp_err_t serialization_result = payload_serializer.serialize(current_payload, json);
     if (serialization_result != ESP_OK) {
         return serialization_result;
