@@ -88,6 +88,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         pdFALSE,
         pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
+    //TODO: change event handlers as local vars?
     if ((result = esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, this->_instance_got_ip)) !=
         ESP_OK) return result;
     if ((result = esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, this->_instance_any_id)) !=
@@ -142,3 +143,22 @@ esp_err_t WiFiManager::set_static_ip() {
 
     return ESP_OK;
 }
+
+esp_err_t WiFiManager::deinit_wifi_station() {
+    //TODO: saving to RTC memory (channel, BBSID)
+    esp_err_t result = ESP_OK;
+
+    if ((result = esp_wifi_stop()) != ESP_OK) return result;
+
+    if ((result = esp_wifi_deinit()) != ESP_OK) return result;
+
+    esp_netif_destroy_default_wifi(_sta_netif);
+    _sta_netif = nullptr;
+
+    if ((result = esp_netif_deinit()) != ESP_OK) return result;
+
+    if ((result = esp_event_loop_delete_default()) != ESP_OK) return result;
+
+    return ESP_OK;
+}
+

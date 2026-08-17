@@ -71,6 +71,12 @@ class WiFiManager {
      * @return Other esp errors if something went wrong.
      */
     esp_err_t set_static_ip();
+
+    /**
+     * TODO: docs
+     * @return
+     */
+    esp_err_t deinit_wifi_station();
 };
 
 
