@@ -4,7 +4,11 @@
 
 #include "WeatherStation.h"
 
+#include <esp_log.h>
+
+#include "esp_sleep.h"
 #include "JsonPayloadSerializer.h"
+
 // TODO: better error logging? inside of SensorManager?
 esp_err_t WeatherStation::init_sensors() {
     return sensor_manager.init_sensors();
@@ -41,7 +45,23 @@ esp_err_t WeatherStation::send() {
 }
 
 esp_err_t WeatherStation::sleep() {
-    //TODO: method
-    return ESP_OK;
-}
+    esp_err_t disconnect_result = ESP_OK;
 
+    if ((disconnect_result = mqtt_transport.disconnect()) != ESP_OK) {
+        ESP_LOGE("MQTT", "Problem with mqtt disconnection: %s", esp_err_to_name(disconnect_result));
+    }
+
+    if ((disconnect_result = wifi_manager.deinit_wifi_station()) != ESP_OK) {
+        ESP_LOGE("WIFI", "Problem with wifi deinitialization: %s", esp_err_to_name(disconnect_result));
+    }
+
+    esp_err_t sleep_result = ESP_OK;
+    sleep_result = esp_sleep_enable_timer_wakeup(600000000ULL); //TODO: method/macro to automated calculation from seconds to us?
+    if (sleep_result != ESP_OK) {
+        return sleep_result;
+    }
+
+    esp_deep_sleep_start();
+
+    return ESP_OK; //unreachable code, but required by compilator? (I guess so)
+}
