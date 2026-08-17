@@ -25,16 +25,20 @@ esp_err_t WeatherStation::measure() {
 
 esp_err_t WeatherStation::send() {
     JsonPayloadSerializer payload_serializer = JsonPayloadSerializer();
+    std::string json = std::string();
 
     //Here will be some sort of error checking. If serialization succeed :D
-    std::string serialized_string = payload_serializer.serialize(current_payload);
+    esp_err_t serialization_result = payload_serializer.serialize(current_payload, json);
+    if (serialization_result != ESP_OK) {
+        return serialization_result;
+    }
 
     esp_err_t init_communication_result = init_communication();
     if (init_communication_result != ESP_OK) {
         return init_communication_result;
     }
 
-    return mqtt_transport.publish(serialized_string);
+    return mqtt_transport.publish(json);
 }
 
 esp_err_t WeatherStation::sleep() {

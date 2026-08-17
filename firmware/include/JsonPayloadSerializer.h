@@ -18,6 +18,7 @@
  */
 class JsonPayloadSerializer : public IPayloadSerializer {
     /**
+     * TODO: update docs
      * @brief Serializes payload to JSON format.
      *
      * This method serialize payload data into stringified JSON format using cJSON component.
@@ -26,5 +27,5 @@ class JsonPayloadSerializer : public IPayloadSerializer {
      * @return Payload serialized to string in JSON format.
      */
 public:
-    std::string serialize(const SensorManager::Payload &payload) override;
+    esp_err_t serialize(const SensorManager::Payload &payload, std::string& serialize_string) override;
 };

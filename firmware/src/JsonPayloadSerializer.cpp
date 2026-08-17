@@ -8,9 +8,10 @@
 #include "cJSON.h"
 #include "../managed_components/espressif__cjson/cJSON/cJSON.h"
 
-//TODO: better memory handling (out of memory, heap fragmentation etc)
-std::string JsonPayloadSerializer::serialize(const SensorManager::Payload& payload) {
+esp_err_t JsonPayloadSerializer::serialize(const SensorManager::Payload& payload, std::string& serialize_string) {
     cJSON *object = cJSON_CreateObject();
+
+    if (object == nullptr) return ESP_ERR_NO_MEM;
 
     cJSON_AddNumberToObject(object, "light_intensity", payload.light_intensity);
     cJSON_AddNumberToObject(object, "humidity", payload.bme_data.humidity);
@@ -18,9 +19,14 @@ std::string JsonPayloadSerializer::serialize(const SensorManager::Payload& paylo
     cJSON_AddNumberToObject(object, "pressure", payload.bme_data.pressure);
 
     char *raw_json = cJSON_PrintUnformatted(object);
-    std::string string_json = raw_json;
+    if (raw_json == nullptr) {
+        cJSON_Delete(object);
+        return ESP_ERR_NO_MEM;
+    }
+
+    serialize_string = raw_json;
     cJSON_Delete(object);
     cJSON_free(raw_json);
 
-    return string_json;
+    return ESP_OK;
 }

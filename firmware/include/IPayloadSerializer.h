@@ -28,7 +28,7 @@ public:
      * @param payload reference to Payload structure.
      * @return Payload serialized to string.
      */
-    virtual esp_err_t serialize(const SensorManager::Payload& payload, std::string serialize_string) = 0;
+    virtual esp_err_t serialize(const SensorManager::Payload& payload, std::string& serialize_string) = 0;
 };
 
 #endif //FIRMWARE_IPAYLOADSERIALIZER_H
