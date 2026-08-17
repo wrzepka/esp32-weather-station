@@ -22,11 +22,11 @@ public:
     virtual ~IPayloadSerializer() = default;
 
     /**
-     * TODO: update docs
      * @brief Serializes payload into a target representation.
      *
      * @param payload reference to Payload structure.
-     * @return Payload serialized to string.
+     * @param[out] serialize_string reference to serialized string used further in data transportation.
+     * @return ESP_OK if serialization succeed, otherwise some ESP error, dependent on implementation.
      */
     virtual esp_err_t serialize(const SensorManager::Payload& payload, std::string& serialize_string) = 0;
 };
