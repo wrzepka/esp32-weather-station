@@ -22,12 +22,13 @@ public:
     virtual ~IPayloadSerializer() = default;
 
     /**
+     * TODO: update docs
      * @brief Serializes payload into a target representation.
      *
      * @param payload reference to Payload structure.
      * @return Payload serialized to string.
      */
-    virtual std::string serialize(const SensorManager::Payload& payload) = 0;
+    virtual esp_err_t serialize(const SensorManager::Payload& payload, std::string serialize_string) = 0;
 };
 
 #endif //FIRMWARE_IPAYLOADSERIALIZER_H
