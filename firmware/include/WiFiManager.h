@@ -73,8 +73,13 @@ class WiFiManager {
     esp_err_t set_static_ip();
 
     /**
-     * TODO: docs
-     * @return
+     * @brief Deinitialize the Wi-Fi component.
+     *
+     * Stops and deinitializes Wi-Fi, then destroys the network interface,
+     * and finally deletes the default event loop.
+     *
+     * @return ESP_OK if deinitialization succeed.
+     * @return Other ESP errors if deinitialization failed.
      */
     esp_err_t deinit_wifi_station();
 };
