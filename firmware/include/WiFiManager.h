@@ -2,7 +2,7 @@
  * @file WiFiManager.h
  * @author Wiktor
  * @brief Class for handling connection with Wi-Fi WPA2
- * @date 17.07.2026
+ * @date 18.08.2026
  *
  * @note Implementation is based on official ESP-IDF examples:
  * @see https://github.com/espressif/esp-idf/tree/v6.0.2/examples/protocols/static_ip
