@@ -2,7 +2,7 @@
  * @file SensorManager.h
  * @author Wiktor
  * @brief Class for handling management of weather station sensors.
- * @date 05.08.2026
+ * @date 18.08.2026
  **/
 #ifndef FIRMWARE_SENSORMANAGER_H
 #define FIRMWARE_SENSORMANAGER_H
@@ -30,18 +30,18 @@ public:
     };
 
     /**
-     * TODO: update docs
-     * @brief Initializes sensors.
-     *
-     * Initializes all sensors (BH1750, BME280) by using begin() methods.
+     * @brief Passes i2c master bus handle for sensors handling
      *
      * @param i2c_master_bus_handle I2C master bus handle.
      */
     SensorManager(i2c_master_bus_handle_t i2c_master_bus_handle): i2c_bus_handle(i2c_master_bus_handle){};
 
     /**
-     * TODO: update docs
-     * @return
+     * @brief Initializes sensors.
+     *
+     * Initializes BME280 and BH1750 sensors.
+     * @return ESP_OK if initialization succeed.
+     * @return Many others ESP errors if something went wrong.
      */
     esp_err_t init_sensors();
 
