@@ -21,10 +21,10 @@
  */
 class WeatherStation {
     SensorManager::Payload current_payload{};/**<Current weather data payload.*/
-    SensorManager sensor_manager;/**Instance of sensor manager.*/
-    WiFiManager wifi_manager;/**Instance of Wi-Fi manager.*/
-    MqttTransport mqtt_transport;/**Instance of Wi-Fi manager.*/ //Change to interface ITelemtryTransport?
-    constexpr static uint64_t deep_sleep_length_in_minutes = 10;
+    SensorManager sensor_manager;/**<Instance of sensor manager.*/
+    WiFiManager wifi_manager;/**<Instance of Wi-Fi manager.*/
+    MqttTransport mqtt_transport;/**<Instance of Wi-Fi manager.*/ //Change to interface ITelemtryTransport?
+    constexpr static uint64_t deep_sleep_length_in_minutes = 10;/**<Amount of time that station will be in deep sleep.*/
 
 public:
     WeatherStation(i2c_master_bus_handle_t i2c_bus_handle, const char* brokerIp, uint16_t brokerPort): sensor_manager(i2c_bus_handle), mqtt_transport(brokerIp, brokerPort){};
@@ -78,6 +78,12 @@ public:
     esp_err_t sleep();
 
 private:
+    /**
+     * @brief Auxiliary method that converts minutes to microseconds.
+     *
+     * @param minutes Amount of minutes to be converted.
+     * @return Calculated time in microseconds.
+     */
     constexpr uint64_t minutes_to_us(uint64_t minutes) {
         return minutes * 60ULL * 1'000'000ULL;
     }
