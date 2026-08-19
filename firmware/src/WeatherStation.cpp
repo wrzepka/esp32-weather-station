@@ -56,7 +56,7 @@ esp_err_t WeatherStation::sleep() {
     }
 
     esp_err_t sleep_result = ESP_OK;
-    sleep_result = esp_sleep_enable_timer_wakeup(600000000ULL); //TODO: method/macro to automated calculation from seconds to us?
+    sleep_result = esp_sleep_enable_timer_wakeup(minutes_to_us(deep_sleep_length_in_minutes));
     if (sleep_result != ESP_OK) {
         return sleep_result;
     }
