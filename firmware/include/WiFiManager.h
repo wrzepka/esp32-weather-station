@@ -34,13 +34,13 @@ class WiFiManager {
     static constexpr auto STATION_NETMASK = "255.255.255.0"; /** Network mask of this station's network*/
     static constexpr auto STATION_GATEWAY = "10.246.161.1"; /** Gateway of this station's network*/
 
-    struct __attribute__((packed)) fast_connect_data {
+    struct __attribute__((packed)) FastConnectData {
         uint8_t channel;
         uint8_t bssid[6];
         uint16_t crc16;
     }; /**< Structure used for holding data that need to be saved after deep sleep for Wi-fi.*/
 
-    static fast_connect_data rtc_data; /**<Declaration of structure that will be saved in RTC memory.*/
+    static FastConnectData rtc_data; /**<Declaration of structure that will be saved in RTC memory.*/
 
     public:
     WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr) {};

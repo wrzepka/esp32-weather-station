@@ -163,7 +163,7 @@ esp_err_t WiFiManager::deinit_wifi_station() {
     return ESP_OK;
 }
 
-RTC_DATA_ATTR WiFiManager::fast_connect_data WiFiManager::rtc_data{};
+RTC_DATA_ATTR WiFiManager::FastConnectData WiFiManager::rtc_data{};
 
 esp_err_t WiFiManager::save_fast_connect_data() {
     wifi_ap_record_t ap_info = {};
