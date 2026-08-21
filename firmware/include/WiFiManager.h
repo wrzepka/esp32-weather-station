@@ -33,6 +33,15 @@ class WiFiManager {
     static constexpr auto STATION_IP = "10.246.161.67"; /** Local IP address of this station*/
     static constexpr auto STATION_NETMASK = "255.255.255.0"; /** Network mask of this station's network*/
     static constexpr auto STATION_GATEWAY = "10.246.161.1"; /** Gateway of this station's network*/
+
+    struct __attribute__((packed)) fast_connect_data {
+        uint8_t channel;
+        uint8_t bssid[6];
+        uint16_t crc16;
+    };
+
+    static fast_connect_data rtc_data;
+
     public:
     WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr) {};
 
@@ -82,6 +91,9 @@ class WiFiManager {
      * @return Other ESP errors if deinitialization failed.
      */
     esp_err_t deinit_wifi_station();
+
+private:
+    esp_err_t save_fast_connect_data();
 };
 
 

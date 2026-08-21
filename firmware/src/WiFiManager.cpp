@@ -8,6 +8,7 @@
 
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "esp_rom_crc.h"
 
 namespace {
     /**
@@ -162,3 +163,16 @@ esp_err_t WiFiManager::deinit_wifi_station() {
     return ESP_OK;
 }
 
+RTC_DATA_ATTR WiFiManager::fast_connect_data WiFiManager::rtc_data{};
+
+esp_err_t WiFiManager::save_fast_connect_data() {
+    wifi_ap_record_t ap_info = {};
+    esp_err_t result = esp_wifi_sta_get_ap_info(&ap_info);
+    if (result != ESP_OK) return result;
+
+    memcpy(rtc_data.bssid, ap_info.bssid, sizeof(ap_info.bssid));
+    rtc_data.channel = ap_info.primary;
+    rtc_data.crc16 = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data), sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
+
+    return ESP_OK;
+}
