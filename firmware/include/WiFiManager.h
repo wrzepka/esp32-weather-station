@@ -38,9 +38,9 @@ class WiFiManager {
         uint8_t channel;
         uint8_t bssid[6];
         uint16_t crc16;
-    };
+    }; /**< Structure used for holding data that need to be saved after deep sleep for Wi-fi.*/
 
-    static fast_connect_data rtc_data;
+    static fast_connect_data rtc_data; /**<Declaration of structure that will be saved in RTC memory.*/
 
     public:
     WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr) {};
@@ -93,7 +93,19 @@ class WiFiManager {
     esp_err_t deinit_wifi_station();
 
 private:
+    /**
+     * @brief Moves channel and bssid information to the structure that is sustained in RTC memory.
+     *
+     * @return ESP_OK if saving succeed
+     * @return Other ESP errors if something gone wrong.
+     */
     esp_err_t save_fast_connect_data();
+
+    /**
+     * @brief Checks CRC value of the channel and bssid fields inside FastConnectData structure.
+     *
+     * @return True if FastConnectData structure is not corrupted. Otherwise, it returns False.
+     */
     bool is_fast_connect_data_valid();
 };
 
