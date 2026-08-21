@@ -176,3 +176,13 @@ esp_err_t WiFiManager::save_fast_connect_data() {
 
     return ESP_OK;
 }
+
+bool WiFiManager::is_fast_connect_data_valid() {
+    if (rtc_data.channel < 1 || rtc_data.channel > 13) {
+        return false;
+    }
+
+    uint16_t calculated_crc = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data), sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
+
+    return (calculated_crc == rtc_data.crc16);
+}

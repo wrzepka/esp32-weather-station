@@ -94,6 +94,7 @@ class WiFiManager {
 
 private:
     esp_err_t save_fast_connect_data();
+    bool is_fast_connect_data_valid();
 };
 
 
