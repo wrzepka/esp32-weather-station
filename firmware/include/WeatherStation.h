@@ -9,7 +9,7 @@
 #include <esp_err.h>
 #include <driver/i2c_types.h>
 
-#include "MqttTransport.h"
+#include "ITelemetryTransport.h"
 #include "SensorManager.h"
 #include "WiFiManager.h"
 
@@ -23,11 +23,11 @@ class WeatherStation {
     SensorManager::Payload current_payload{};/**<Current weather data payload.*/
     SensorManager sensor_manager;/**<Instance of sensor manager.*/
     WiFiManager wifi_manager;/**<Instance of Wi-Fi manager.*/
-    MqttTransport mqtt_transport;/**<Instance of Wi-Fi manager.*/ //Change to interface ITelemtryTransport?
+    ITelemetryTransport& transport;/**<Reference to the instance of some transport manager.*/
     constexpr static uint64_t deep_sleep_length_in_minutes = 10;/**<Amount of time that station will be in deep sleep.*/
 
 public:
-    WeatherStation(i2c_master_bus_handle_t i2c_bus_handle, const char* brokerIp, uint16_t brokerPort): sensor_manager(i2c_bus_handle), mqtt_transport(brokerIp, brokerPort){};
+    WeatherStation(i2c_master_bus_handle_t i2c_bus_handle, ITelemetryTransport& transport): sensor_manager(i2c_bus_handle), transport(transport){};
 
     /**
      * @brief Initializes sensors via SensorManager.

@@ -20,7 +20,7 @@ esp_err_t WeatherStation::init_communication() {
         return result;
     }
 
-    return mqtt_transport.connect();
+    return transport.connect();
 };
 
 esp_err_t WeatherStation::measure() {
@@ -41,13 +41,13 @@ esp_err_t WeatherStation::send() {
         return init_communication_result;
     }
 
-    return mqtt_transport.publish(json);
+    return transport.publish(json);
 }
 
 esp_err_t WeatherStation::sleep() {
     esp_err_t disconnect_result = ESP_OK;
 
-    if ((disconnect_result = mqtt_transport.disconnect()) != ESP_OK) {
+    if ((disconnect_result = transport.disconnect()) != ESP_OK) {
         ESP_LOGE("MQTT", "Problem with mqtt disconnection: %s", esp_err_to_name(disconnect_result));
     }
 
