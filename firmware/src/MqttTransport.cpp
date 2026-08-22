@@ -61,7 +61,6 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
             break;
         case MQTT_EVENT_DISCONNECTED:
             ESP_LOGI("MQTT", "MQTT DISCONNECTED.");
-            mqtt_client->disconnect();
             xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_DISCONNECTED_BIT);
             break;
         case MQTT_EVENT_ERROR:
@@ -74,7 +73,32 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
 }
 
 esp_err_t MqttTransport::disconnect() {
-    return esp_mqtt_client_disconnect(this->m_client);
+    if (this->m_client == nullptr) {
+        return ESP_OK;
+    }
+
+    xEventGroupClearBits(this->m_event_group_handle, MQTT_DISCONNECTED_BIT);
+
+    esp_err_t result = esp_mqtt_client_disconnect(this->m_client);
+    if (result != ESP_OK) {
+        return result;
+    }
+
+    EventBits_t bits = xEventGroupWaitBits(
+        this->m_event_group_handle,
+        MQTT_DISCONNECTED_BIT,
+        pdTRUE,
+        pdFALSE,
+        pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
+
+    esp_mqtt_client_stop(this->m_client);
+    esp_mqtt_client_destroy(this->m_client);
+    this->m_client = nullptr;
+
+    if (bits & MQTT_DISCONNECTED_BIT) {
+        return ESP_OK;
+    }
+    return ESP_ERR_TIMEOUT;
 }
 
 esp_err_t MqttTransport::publish(const std::string& serializedPayload) {

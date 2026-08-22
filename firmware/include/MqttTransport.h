@@ -75,6 +75,7 @@ public:
     esp_err_t connect() override;
 
     /**
+     * //TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Disconnects station from the broker.
      *
