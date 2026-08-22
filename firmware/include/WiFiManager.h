@@ -60,6 +60,7 @@ class WiFiManager {
                                    int32_t event_id, void* event_data);
 
     /**
+     * //TODO: update docs
      * @brief Initializes and configures Wi-Fi module.
      *
      * Creates and uses handles for network interface, events and event group. Next setups wi-fi module

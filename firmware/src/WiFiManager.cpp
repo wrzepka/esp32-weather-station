@@ -28,6 +28,7 @@ namespace {
         }
 
         EventGroup(const EventGroup &) = delete;
+
         EventGroup &operator=(const EventGroup &) = delete;
     };
 }
@@ -55,6 +56,8 @@ esp_err_t WiFiManager::init_wifi_station() {
     wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
     if ((result = esp_wifi_init(&init_config)) != ESP_OK) return result;
 
+    esp_wifi_set_storage(WIFI_STORAGE_RAM);
+
     result = esp_event_handler_instance_register(
         WIFI_EVENT,
         ESP_EVENT_ANY_ID,
@@ -74,8 +77,19 @@ esp_err_t WiFiManager::init_wifi_station() {
     wifi_config_t wifi_config = {};
     strlcpy(reinterpret_cast<char *>(wifi_config.sta.ssid), WIFI_SSID, sizeof(wifi_config.sta.ssid));
     strlcpy(reinterpret_cast<char *>(wifi_config.sta.password), WIFI_PASSWORD, sizeof(wifi_config.sta.password));
-    wifi_config.sta.scan_method = WIFI_FAST_SCAN;
-    wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+
+    esp_reset_reason_t reason = esp_reset_reason();
+    bool made_full_scan = false;
+
+    if (reason == ESP_RST_DEEPSLEEP && is_fast_connect_data_valid()) {
+        memcpy(wifi_config.sta.bssid, rtc_data.bssid, sizeof(rtc_data.bssid));
+        wifi_config.sta.bssid_set = true;
+        wifi_config.sta.channel = rtc_data.channel;
+    } else {
+        wifi_config.sta.scan_method = WIFI_FAST_SCAN;
+        wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+        made_full_scan = true;
+    }
 
     if ((result = esp_wifi_set_mode(WIFI_MODE_STA)) != ESP_OK) return result;
     if ((result = esp_wifi_set_config(WIFI_IF_STA, &wifi_config)) != ESP_OK) return result;
@@ -91,11 +105,19 @@ esp_err_t WiFiManager::init_wifi_station() {
 
     //TODO: change event handlers as local vars?
     if ((result = esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, this->_instance_got_ip)) !=
-        ESP_OK) return result;
+        ESP_OK)
+        return result;
     if ((result = esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, this->_instance_any_id)) !=
-        ESP_OK) return result;
+        ESP_OK)
+        return result;
 
     if (bits & WIFI_CONNECTED_BIT) {
+        if (made_full_scan) {
+            esp_err_t save_result = save_fast_connect_data();
+            if (save_result != ESP_OK) {
+                return save_result;
+            }
+        }
         return ESP_OK;
     }
     return ESP_ERR_TIMEOUT;
@@ -172,7 +194,8 @@ esp_err_t WiFiManager::save_fast_connect_data() {
 
     memcpy(rtc_data.bssid, ap_info.bssid, sizeof(ap_info.bssid));
     rtc_data.channel = ap_info.primary;
-    rtc_data.crc16 = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data), sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
+    rtc_data.crc16 = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data),
+                                      sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
 
     return ESP_OK;
 }
@@ -182,7 +205,8 @@ bool WiFiManager::is_fast_connect_data_valid() {
         return false;
     }
 
-    uint16_t calculated_crc = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data), sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
+    uint16_t calculated_crc = esp_rom_crc16_le(0, reinterpret_cast<uint8_t const *>(&rtc_data),
+                                               sizeof(rtc_data.bssid) + sizeof(rtc_data.channel));
 
     return (calculated_crc == rtc_data.crc16);
 }
