@@ -168,7 +168,6 @@ esp_err_t WiFiManager::set_static_ip() {
 }
 
 esp_err_t WiFiManager::deinit_wifi_station() {
-    //TODO: saving to RTC memory (channel, BBSID)
     esp_err_t result = ESP_OK;
 
     if ((result = esp_wifi_stop()) != ESP_OK) return result;
