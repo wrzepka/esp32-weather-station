@@ -58,12 +58,15 @@ esp_err_t WiFiManager::init_wifi_station() {
 
     esp_wifi_set_storage(WIFI_STORAGE_RAM);
 
+    esp_event_handler_instance_t instance_any_id;
+    esp_event_handler_instance_t instance_got_ip;
+
     result = esp_event_handler_instance_register(
         WIFI_EVENT,
         ESP_EVENT_ANY_ID,
         &WiFiManager::wifi_event_handler,
         network_event_group.handle,
-        &this->_instance_any_id);
+        &instance_any_id);
     if (result != ESP_OK) return result;
 
     result = esp_event_handler_instance_register(
@@ -71,7 +74,7 @@ esp_err_t WiFiManager::init_wifi_station() {
         IP_EVENT_STA_GOT_IP,
         &WiFiManager::wifi_event_handler,
         network_event_group.handle,
-        &this->_instance_got_ip);
+        &instance_got_ip);
     if (result != ESP_OK) return result;
 
     wifi_config_t wifi_config = {};
@@ -103,11 +106,10 @@ esp_err_t WiFiManager::init_wifi_station() {
         pdFALSE,
         pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
-    //TODO: change event handlers as local vars?
-    if ((result = esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, this->_instance_got_ip)) !=
+    if ((result = esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip)) !=
         ESP_OK)
         return result;
-    if ((result = esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, this->_instance_any_id)) !=
+    if ((result = esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id)) !=
         ESP_OK)
         return result;
 

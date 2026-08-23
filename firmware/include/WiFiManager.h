@@ -22,8 +22,6 @@
 class WiFiManager {
     private:
     esp_netif_t *_sta_netif; /**< Pointer to station network interface handle.*/
-    esp_event_handler_instance_t _instance_any_id; /**< Handle for Wi-Fi types events.*/
-    esp_event_handler_instance_t _instance_got_ip; /**< Handle for IP types events.*/
     static constexpr auto WIFI_SSID = "PocoF5"; /**< SSID of used Wi-Fi network.*/
     static constexpr auto WIFI_PASSWORD = "12345678"; /**< Password of used Wi-Fi network.*/
     static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000 /**< Max waiting time for response from EventGroup functions.*/;
@@ -43,7 +41,7 @@ class WiFiManager {
     static FastConnectData rtc_data; /**<Declaration of structure that will be saved in RTC memory.*/
 
     public:
-    WiFiManager(): _sta_netif(nullptr), _instance_any_id(nullptr), _instance_got_ip(nullptr) {};
+    WiFiManager(): _sta_netif(nullptr) {};
 
     /**
      * @brief Callback function for Wi-Fi events.
