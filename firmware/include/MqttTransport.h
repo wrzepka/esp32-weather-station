@@ -75,9 +75,11 @@ public:
     esp_err_t connect() override;
 
     /**
-     * //TODO: update docs
      * @note This is mandatory implementation of ITelemetryTransport interface method.
      * @brief Disconnects station from the broker.
+     *
+     * Disconnects station from the broker and waits for successful DISCONNECT_BIT. Then stops and destroys mqtt client
+     * handle.
      *
      * @return ESP_OK if initialization succeed.
      * @return ESP_ERR_INVALID_ARG if something went wrong.
