@@ -58,11 +58,13 @@ class WiFiManager {
                                    int32_t event_id, void* event_data);
 
     /**
-     * //TODO: update docs
      * @brief Initializes and configures Wi-Fi module.
      *
      * Creates and uses handles for network interface, events and event group. Next setups wi-fi module
      * for work in STATION MODE with static IP.
+     *
+     * Depending on station launch type. It commits fast-scan launch and saves bssid, channel to the structure stored
+     * inside rtc memory, or uses that structure to launch station without energy-hungry fast-scan.
      *
      * @return ESP_OK if initialization succeed.
      * @return Other esp errors if something went wrong.
