@@ -13,6 +13,7 @@ esp_err_t JsonPayloadSerializer::serialize(const SensorManager::Payload& payload
 
     if (object == nullptr) return ESP_ERR_NO_MEM;
 
+    //TODO: memory handling. passing null values if payload values are wrong.
     cJSON_AddNumberToObject(object, "light_intensity", payload.light_intensity);
     cJSON_AddNumberToObject(object, "humidity", payload.bme_data.humidity);
     cJSON_AddNumberToObject(object, "temperature", payload.bme_data.temperature);
