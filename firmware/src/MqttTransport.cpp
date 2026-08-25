@@ -73,19 +73,19 @@ void MqttTransport::mqtt5_event_handler(void *handler_args, esp_event_base_t bas
 
     switch (static_cast<esp_mqtt_event_id_t>(event_id)) {
         case MQTT_EVENT_CONNECTED:
-            ESP_LOGI("MQTT", "MQTT CONNECTED.");
+            ESP_LOGI(TAG, "MQTT CONNECTED.");
             xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_CONNECTED_BIT);
             break;
         case MQTT_EVENT_PUBLISHED:
-            ESP_LOGI("MQTT", "MQTT PUBLISHED.");
+            ESP_LOGI(TAG, "MQTT PUBLISHED.");
             xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_PUBLISHED_BIT);
             break;
         case MQTT_EVENT_DISCONNECTED:
-            ESP_LOGI("MQTT", "MQTT DISCONNECTED.");
+            ESP_LOGI(TAG, "MQTT DISCONNECTED.");
             xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_DISCONNECTED_BIT);
             break;
         case MQTT_EVENT_ERROR:
-            ESP_LOGI("MQTT", "MQTT_EVENT_ERROR: %d", event->msg_id);
+            ESP_LOGI(TAG, "MQTT_EVENT_ERROR: %d", event->msg_id);
             xEventGroupSetBits(mqtt_client->m_event_group_handle, MQTT_ERROR_BIT);
             break;
         default:
@@ -98,16 +98,17 @@ esp_err_t MqttTransport::disconnect() {
         return ESP_OK;
     }
 
-    xEventGroupClearBits(this->m_event_group_handle, MQTT_DISCONNECTED_BIT);
+    xEventGroupClearBits(this->m_event_group_handle, MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT);
 
     esp_err_t result = esp_mqtt_client_disconnect(this->m_client);
     if (result != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to disconnect from the broker.");
         return result;
     }
 
     EventBits_t bits = xEventGroupWaitBits(
         this->m_event_group_handle,
-        MQTT_DISCONNECTED_BIT,
+        MQTT_DISCONNECTED_BIT | MQTT_ERROR_BIT,
         pdTRUE,
         pdFALSE,
         pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
@@ -119,13 +120,23 @@ esp_err_t MqttTransport::disconnect() {
     if (bits & MQTT_DISCONNECTED_BIT) {
         return ESP_OK;
     }
+
+    ESP_LOGE(TAG, "Failed to disconnect from the broker.");
     return ESP_ERR_TIMEOUT;
 }
 
 esp_err_t MqttTransport::publish(const std::string& serializedPayload) {
+    if (this->m_client == nullptr) {
+        ESP_LOGE(TAG, "Couldn't publish a message because of lack of the esp_mqtt_client_handle_t.");
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    xEventGroupClearBits(this->m_event_group_handle, MQTT_PUBLISHED_BIT | MQTT_ERROR_BIT | MQTT_DISCONNECTED_BIT);
+
     int result = esp_mqtt_client_publish(this->m_client, TOPIC, serializedPayload.c_str(), static_cast<int>(serializedPayload.length()), QOS, 0);
 
     if (result < 0) {
+        ESP_LOGE(TAG, "Failed to publish a message.");
         return ESP_FAIL;
     }
 
@@ -139,5 +150,7 @@ esp_err_t MqttTransport::publish(const std::string& serializedPayload) {
     if (bits & MQTT_PUBLISHED_BIT) {
         return ESP_OK;
     }
+
+    ESP_LOGE(TAG, "Failed to publish a message.");
     return ESP_FAIL;
 }
