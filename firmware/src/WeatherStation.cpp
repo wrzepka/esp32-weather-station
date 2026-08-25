@@ -9,7 +9,8 @@
 #include "esp_sleep.h"
 #include "JsonPayloadSerializer.h"
 
-// TODO: better error logging? inside of SensorManager?
+static auto TAG = "WeatherStation";
+
 esp_err_t WeatherStation::init_sensors() {
     return sensor_manager.init_sensors();
 };
@@ -45,19 +46,13 @@ esp_err_t WeatherStation::send() {
 }
 
 esp_err_t WeatherStation::sleep() {
-    esp_err_t disconnect_result = ESP_OK;
-
-    if ((disconnect_result = transport.disconnect()) != ESP_OK) {
-        ESP_LOGE("MQTT", "Problem with mqtt disconnection: %s", esp_err_to_name(disconnect_result));
-    }
-
-    if ((disconnect_result = wifi_manager.deinit_wifi_station()) != ESP_OK) {
-        ESP_LOGE("WIFI", "Problem with wifi deinitialization: %s", esp_err_to_name(disconnect_result));
-    }
+    transport.disconnect();
+    wifi_manager.deinit_wifi_station();
 
     esp_err_t sleep_result = ESP_OK;
     sleep_result = esp_sleep_enable_timer_wakeup(minutes_to_us(deep_sleep_length_in_minutes));
     if (sleep_result != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to configure wakeup timer: %s", esp_err_to_name(sleep_result));
         return sleep_result;
     }
 
