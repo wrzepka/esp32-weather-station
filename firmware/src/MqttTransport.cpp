@@ -4,10 +4,12 @@
 
 #include "../include/MqttTransport.h"
 
+#include <esp_check.h>
 #include <esp_log.h>
 
 #include "mqtt_client.h"
 
+static auto TAG = "MqttTransport";
 
 esp_err_t MqttTransport::connect() {
     esp_mqtt_client_config_t mqtt_cfg = {};
@@ -19,18 +21,30 @@ esp_err_t MqttTransport::connect() {
 
     esp_mqtt5_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
     if (client == nullptr) {
+        ESP_LOGE(TAG, "Failed to initialize MQTT client.");
         return ESP_FAIL;
     }
+
     this->m_client = client;
 
     esp_err_t result = ESP_OK;
     result = esp_mqtt_client_register_event(client, static_cast<esp_mqtt_event_id_t>(ESP_EVENT_ANY_ID),
                                             mqtt5_event_handler, this);
     if (result != ESP_OK) {
+        esp_mqtt_client_destroy(this->m_client);
+        this->m_client = nullptr;
+
+        ESP_LOGE(TAG, "Failed to register MQTT event.");
         return result;
     }
+
+    xEventGroupClearBits(this->m_event_group_handle, MQTT_DISCONNECTED_BIT | MQTT_CONNECTED_BIT | MQTT_ERROR_BIT);
     result = esp_mqtt_client_start(client);
     if (result != ESP_OK) {
+        esp_mqtt_client_destroy(this->m_client);
+        this->m_client = nullptr;
+
+        ESP_LOGE(TAG, "Failed to start MQTT client.");
         return result;
     }
 
@@ -42,6 +56,13 @@ esp_err_t MqttTransport::connect() {
         pdMS_TO_TICKS(MAX_EVENT_GROUP_WAIT_TIME));
 
     if (bits & MQTT_CONNECTED_BIT) return ESP_OK;
+
+    esp_mqtt_client_stop(this->m_client);
+    esp_mqtt_client_destroy(this->m_client);
+    this->m_client = nullptr;
+
+    ESP_LOGE(TAG, "Failed to connect to the MQTT broker.");
+
     return ESP_FAIL;
 }
 
