@@ -16,6 +16,7 @@ esp_err_t JsonPayloadSerializer::serialize(const SensorManager::Payload& payload
 
     if (object == nullptr) return ESP_ERR_NO_MEM;
 
+    // Auxiliary lambda function for adding new fields to the cJSON object.
     auto add_field = [&object](const char* name, auto value, auto error_value) -> bool {
         cJSON* item = (value == error_value) ? cJSON_AddNullToObject(object, name) : cJSON_AddNumberToObject(object, name, value);
 
