@@ -7,6 +7,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "WeatherStation.h"
 #include "../include/MqttTransport.h"
 #include "WiFiManager.h"
 #include "driver/i2c_master.h"
@@ -21,47 +22,20 @@ void i2c_scanner(i2c_master_bus_handle_t bus_handle);
 static const char *TAG = "FireBeetle 2 ESP32-C6 Weather Station";
 
 extern "C" void app_main(void) {
-    gpio_reset_pin(BLINK_GPIO);
-    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+    // gpio_reset_pin(BLINK_GPIO);
+    // gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
 
     ESP_ERROR_CHECK(init_i2c());
     i2c_master_bus_handle_t i2c_bus_handle;
     i2c_master_get_bus_handle(I2C_NUM_0, &i2c_bus_handle);
 
-    auto *bh1750 = new BH1750();
-    auto *bme280 = new BME280();
-    auto *wifi_manager = new WiFiManager();
-    auto mqtt_manager = new MqttTransport("10.246.161.98", 1883);
+    //TODO: Mqtt
+    MqttTransport transport("10.246.161.98", 1883);
 
-    uint8_t led_state = 0;
-    uint32_t light_intensity = 0;
-    ESP_ERROR_CHECK(bh1750->begin(i2c_bus_handle));
-    BME280::Config bme280_config = {};
-    ESP_ERROR_CHECK(bme280->begin(i2c_bus_handle, bme280_config));
-    wifi_manager->init_wifi_station();
-    esp_err_t result = mqtt_manager->connect();
-    ESP_LOGI(TAG, "MQTT: %s", esp_err_to_name(result));
-    while (true) {
-        i2c_scanner(i2c_bus_handle);
+    //TODO: WeatherStation
+    WeatherStation station(i2c_bus_handle, transport);
 
-        led_state = !led_state;
-        gpio_set_level(BLINK_GPIO, led_state);
-
-        esp_err_t result = bh1750->read_light_intensity_blocking(light_intensity);
-
-        if (result != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to read light intensity: %s", esp_err_to_name(result));
-        }else {
-            ESP_LOGI(TAG, "ILLUMINANCE: %u", light_intensity);
-        }
-
-        // result = bme280->read_weather_data();
-        // if (result != ESP_OK) {
-        //     ESP_LOGE(TAG, "Failed to read BME280 sensor data: %s", esp_err_to_name(result));
-        // }
-
-        vTaskDelay(pdMS_TO_TICKS(10000));
-    }
+    //TODO: Full routine here
 }
 
 esp_err_t init_i2c() {
