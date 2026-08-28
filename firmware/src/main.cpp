@@ -17,6 +17,7 @@
 #define BLINK_GPIO GPIO_NUM_15
 
 esp_err_t init_i2c();
+
 void i2c_scanner(i2c_master_bus_handle_t bus_handle);
 
 static const char *TAG = "FireBeetle 2 ESP32-C6 Weather Station";
@@ -29,13 +30,17 @@ extern "C" void app_main(void) {
     i2c_master_bus_handle_t i2c_bus_handle;
     i2c_master_get_bus_handle(I2C_NUM_0, &i2c_bus_handle);
 
-    //TODO: Mqtt
     MqttTransport transport("10.246.161.98", 1883);
-
-    //TODO: WeatherStation
     WeatherStation station(i2c_bus_handle, transport);
 
-    //TODO: Full routine here
+    esp_err_t operation_result = ESP_OK;
+    if (((operation_result = station.init_sensors()) != ESP_OK) ||
+        ((operation_result = station.measure()) != ESP_OK) ||
+        ((operation_result = station.init_communication()) != ESP_OK) ||
+        ((operation_result = station.send()) != ESP_OK)) {
+        ESP_LOGE(TAG, "Critical sequence failure (%s). Forcing deep sleep.", esp_err_to_name(operation_result));
+    }
+    station.sleep();
 }
 
 esp_err_t init_i2c() {
