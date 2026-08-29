@@ -35,13 +35,13 @@ public class WeatherTelemetry {
 
     }
 
-    public WeatherTelemetry(OffsetDateTime dateTime, String deviceId, float pressure, float temperature, float humidity, int lightIntensity) {
-//        this.dateTime = dateTime;
-//        this.deviceId = deviceId;
-//        this.pressure = pressure;
-//        this.temperature = temperature;
-//        this.humidity = humidity;
-//        this.lightIntensity = lightIntensity;
+    public WeatherTelemetry(OffsetDateTime dateTime, String deviceId, Float pressure, Float temperature, Float humidity, Long lightIntensity) {
+        this.dateTime = dateTime;
+        this.deviceId = deviceId;
+        this.pressure = pressure;
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.lightIntensity = lightIntensity;
     }
 
     public String getDeviceId() {
@@ -52,19 +52,19 @@ public class WeatherTelemetry {
         return dateTime;
     }
 
-    public float getPressure() {
+    public Float getPressure() {
         return pressure;
     }
 
-    public float getTemperature() {
+    public Float getTemperature() {
         return temperature;
     }
 
-    public float getHumidity() {
+    public Float getHumidity() {
         return humidity;
     }
 
-    public int getLightIntensity() {
+    public Long getLightIntensity() {
         return lightIntensity;
     }
 
@@ -76,19 +76,19 @@ public class WeatherTelemetry {
         this.deviceId = deviceId;
     }
 
-    public void setPressure(float pressure) {
+    public void setPressure(Float pressure) {
         this.pressure = pressure;
     }
 
-    public void setTemperature(float temperature) {
+    public void setTemperature(Float temperature) {
         this.temperature = temperature;
     }
 
-    public void setHumidity(float humidity) {
+    public void setHumidity(Float humidity) {
         this.humidity = humidity;
     }
 
-    public void setLightIntensity(int lightIntensity) {
+    public void setLightIntensity(Long lightIntensity) {
         this.lightIntensity = lightIntensity;
     }
 
