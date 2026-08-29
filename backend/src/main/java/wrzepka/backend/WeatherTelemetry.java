@@ -13,38 +13,35 @@ public class WeatherTelemetry {
 
     @Id
     @Column(name = "date_time", nullable = false)
-    @JsonProperty("date_time")
     private OffsetDateTime dateTime;
 
     @Id
     @Column(name = "device_id", nullable = false)
-    @JsonProperty("device_id")
     private String deviceId;
 
-    @Column(name = "pressure", nullable = false)
-    private float pressure;
+    @Column(name = "pressure")
+    private Float pressure;
 
-    @Column(name = "temperature", nullable = false)
-    private float temperature;
+    @Column(name = "temperature")
+    private Float temperature;
 
-    @Column(name = "humidity", nullable = false)
-    private float humidity;
+    @Column(name = "humidity")
+    private Float humidity;
 
-    @Column(name = "light_intensity", nullable = false)
-    @JsonProperty("light_intensity")
-    private int lightIntensity;
+    @Column(name = "light_intensity")
+    private Long lightIntensity;
 
     public WeatherTelemetry() {
 
     }
 
     public WeatherTelemetry(OffsetDateTime dateTime, String deviceId, float pressure, float temperature, float humidity, int lightIntensity) {
-        this.dateTime = dateTime;
-        this.deviceId = deviceId;
-        this.pressure = pressure;
-        this.temperature = temperature;
-        this.humidity = humidity;
-        this.lightIntensity = lightIntensity;
+//        this.dateTime = dateTime;
+//        this.deviceId = deviceId;
+//        this.pressure = pressure;
+//        this.temperature = temperature;
+//        this.humidity = humidity;
+//        this.lightIntensity = lightIntensity;
     }
 
     public String getDeviceId() {
