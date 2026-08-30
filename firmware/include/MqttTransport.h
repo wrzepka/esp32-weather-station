@@ -31,7 +31,7 @@ private:
     static constexpr uint8_t MQTT_PUBLISHED_BIT = BIT2;/**<Bit standing for successful message publication.*/
     static constexpr uint8_t MQTT_ERROR_BIT = BIT3;/**<Bit standing for some error encounter.*/
     static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;/**< Max waiting time for response from EventGroup functions.*/
-    static constexpr auto TOPIC = "iot/weather";/**<Topic used for message recognition.*/
+    static constexpr auto TOPIC_BASE = "iot/weather/";/**<Topic used for message recognition.*/
     static constexpr int QOS = 1;/**<Level of message's Quality Of Service.*/
 
     /**
@@ -46,6 +46,11 @@ private:
      */
     static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
+    /**
+     *
+     * @return
+     */
+    std::string generate_topic();
 public:
     MqttTransport(const char *brokerIp, uint16_t brokerPort) : m_brokerIp(brokerIp), m_brokerPort(brokerPort), m_client(nullptr), m_event_group_handle(xEventGroupCreate()) {
     };
