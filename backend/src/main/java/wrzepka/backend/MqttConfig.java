@@ -10,6 +10,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.Mqttv5ClientManager;
 import org.springframework.integration.mqtt.inbound.Mqttv5PahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
@@ -66,6 +67,18 @@ public class MqttConfig {
             @Override
             public void handleMessage(@NonNull Message<?> message) throws MessagingException {
                 String payload;
+                String topic = message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class);
+
+                if (topic == null || !topic.contains("/")){
+                    throw new IllegalArgumentException();
+                }
+
+                String deviceId = topic.substring(topic.lastIndexOf('/') + 1);
+
+                if (deviceId.isBlank()){
+                    throw new MessagingException("DeviceId in MQTT topic is blank");
+                }
+
                 if (message.getPayload() instanceof byte[]) {
                     payload = new String((byte[]) message.getPayload());
                 } else {
@@ -75,13 +88,8 @@ public class MqttConfig {
                 try {
                     WeatherTelemetry telemetry = objectMapper.readValue(payload, WeatherTelemetry.class);
 
-                    if (telemetry.getDateTime() == null){
+                    if (telemetry.getDateTime() == null) {
                         telemetry.setDateTime(OffsetDateTime.now());
-                    }
-
-                    if (telemetry.getDeviceId() == null || telemetry.getDeviceId().trim().isEmpty()){
-                        System.err.println("Error: DeviceId not found.");
-                        return;
                     }
 
                     repository.save(telemetry);
