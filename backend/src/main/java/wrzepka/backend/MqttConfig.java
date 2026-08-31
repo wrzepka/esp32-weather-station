@@ -86,13 +86,13 @@ public class MqttConfig {
                 }
 
                 try {
-                    WeatherTelemetry telemetry = objectMapper.readValue(payload, WeatherTelemetry.class);
+                    TelemetryPayload telemetryPayload = objectMapper.readValue(payload, TelemetryPayload.class);
 
-                    if (telemetry.getDateTime() == null) {
-                        telemetry.setDateTime(OffsetDateTime.now());
-                    }
+                    TelemetryMapper mapper = new TelemetryMapper(); //TODO: change to dependency injection
 
-                    repository.save(telemetry);
+                    WeatherTelemetry weatherTelemetry = mapper.toEntity(telemetryPayload, deviceId, OffsetDateTime.now());
+
+                    repository.save(weatherTelemetry);
                     System.out.println("Telemetry saved!");
 
                 } catch (Exception e) {
