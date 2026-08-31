@@ -49,7 +49,7 @@ public class MqttConfig {
     public MessageProducer inbound() {
         Mqttv5PahoMessageDrivenChannelAdapter adapter = new Mqttv5PahoMessageDrivenChannelAdapter(
                 mqttv5ClientManager(),
-                "iot/weather"
+                "iot/weather/+"
         );
 
         adapter.setCompletionTimeout(5000);
