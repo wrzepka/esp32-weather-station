@@ -1,6 +1,5 @@
 package wrzepka.backend;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
