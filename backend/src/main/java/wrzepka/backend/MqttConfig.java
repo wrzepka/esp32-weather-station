@@ -24,11 +24,13 @@ public class MqttConfig {
 
     private final WeatherTelemetryRepository repository;
     private final ObjectMapper objectMapper;
+    private final TelemetryMapper telemetryMapper;
 
-    public MqttConfig(WeatherTelemetryRepository repository) {
+    public MqttConfig(WeatherTelemetryRepository repository, TelemetryMapper telemetryMapper) {
         this.repository = repository;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
+        this.telemetryMapper = telemetryMapper;
     }
 
     @Bean
@@ -88,9 +90,7 @@ public class MqttConfig {
                 try {
                     TelemetryPayload telemetryPayload = objectMapper.readValue(payload, TelemetryPayload.class);
 
-                    TelemetryMapper mapper = new TelemetryMapper(); //TODO: change to dependency injection
-
-                    WeatherTelemetry weatherTelemetry = mapper.toEntity(telemetryPayload, deviceId, OffsetDateTime.now());
+                    WeatherTelemetry weatherTelemetry = telemetryMapper.toEntity(telemetryPayload, deviceId, OffsetDateTime.now());
 
                     repository.save(weatherTelemetry);
                     System.out.println("Telemetry saved!");
