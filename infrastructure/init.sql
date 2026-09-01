@@ -1,12 +1,12 @@
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 create table weather_telemetry (
-	date_time timestamptz,
-	device_id varchar(10) not null,
-	pressure REAL not null,
-	temperature REAL not null,
-	humidity REAL not null,
-	light_intensity INTEGER not null,
+	date_time timestamptz not null,
+	device_id varchar(32) not null,
+	pressure REAL,
+	temperature REAL,
+	humidity REAL,
+	light_intensity INTEGER,
 	constraint pk_weather_telemetry PRIMARY KEY (device_id, date_time)
 );
 
