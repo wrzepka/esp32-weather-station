@@ -1,7 +1,10 @@
 package wrzepka.backend;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.logging.LogFactory;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
@@ -25,6 +28,8 @@ public class MqttConfig {
     private final WeatherTelemetryRepository repository;
     private final ObjectMapper objectMapper;
     private final TelemetryMapper telemetryMapper;
+    private final static Logger logger = LoggerFactory.getLogger(MqttConfig.class);
+
 
     public MqttConfig(WeatherTelemetryRepository repository, TelemetryMapper telemetryMapper) {
         this.repository = repository;
@@ -93,11 +98,10 @@ public class MqttConfig {
                     WeatherTelemetry weatherTelemetry = telemetryMapper.toEntity(telemetryPayload, deviceId, OffsetDateTime.now());
 
                     repository.save(weatherTelemetry);
-                    System.out.println("Telemetry saved!");
+                    logger.info("Telemetry saved from station: {}.", deviceId);
 
                 } catch (Exception e) {
-                    System.err.println("Error during message parsing.");
-                    e.printStackTrace();
+                    logger.error("Error during message passing.", e);
                 }
             }
         };
