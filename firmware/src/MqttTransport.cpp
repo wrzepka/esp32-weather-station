@@ -169,10 +169,7 @@ std::string MqttTransport::generate_topic() {
     char topic[64] = {}; //TODO: calc array size;
 
     if (status == ESP_OK) {
-
-        //TODO: find a way to pass ESP32_C6 as some sort of const
-        //.
-        int result = snprintf(topic, sizeof(topic), "%sESP32-C6_%02X-%02X-%02X-%02X-%02X-%02X", TOPIC_BASE ,mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
+        int result = snprintf(topic, sizeof(topic), "%s%s_%02X-%02X-%02X-%02X-%02X-%02X", TOPIC_BASE , m_device_id, mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
 
         if (result > 0 && result < sizeof(topic)) {
             return topic;

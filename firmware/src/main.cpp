@@ -21,6 +21,7 @@ esp_err_t init_i2c();
 void i2c_scanner(i2c_master_bus_handle_t bus_handle);
 
 static const char *TAG = "FireBeetle 2 ESP32-C6 Weather Station";
+static const char *DEVICE_MODEL = "ESP32-C6";
 
 extern "C" void app_main(void) {
     // gpio_reset_pin(BLINK_GPIO);
@@ -30,7 +31,7 @@ extern "C" void app_main(void) {
     i2c_master_bus_handle_t i2c_bus_handle;
     i2c_master_get_bus_handle(I2C_NUM_0, &i2c_bus_handle);
 
-    MqttTransport transport("10.246.161.98", 1883);
+    MqttTransport transport("10.246.161.98", 1883, DEVICE_MODEL);
     WeatherStation station(i2c_bus_handle, transport);
 
     esp_err_t operation_result = ESP_OK;

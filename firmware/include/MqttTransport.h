@@ -33,6 +33,7 @@ private:
     static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;/**< Max waiting time for response from EventGroup functions.*/
     static constexpr auto TOPIC_BASE = "iot/weather/";/**<Topic used for message recognition.*/
     static constexpr int QOS = 1;/**<Level of message's Quality Of Service.*/
+    const char *m_device_id;
 
     /**
      * @brief Event handler for version 5 mqtt protocol.
@@ -52,7 +53,7 @@ private:
      */
     std::string generate_topic();
 public:
-    MqttTransport(const char *brokerIp, uint16_t brokerPort) : m_brokerIp(brokerIp), m_brokerPort(brokerPort), m_client(nullptr), m_event_group_handle(xEventGroupCreate()) {
+    MqttTransport(const char *brokerIp, uint16_t brokerPort, const char *device_id) : m_brokerIp(brokerIp), m_brokerPort(brokerPort), m_client(nullptr), m_event_group_handle(xEventGroupCreate()), m_device_id(device_id) {
     };
 
     ~MqttTransport() {
