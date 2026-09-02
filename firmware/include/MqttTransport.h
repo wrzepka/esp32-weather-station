@@ -33,9 +33,9 @@ private:
     static constexpr uint32_t MAX_EVENT_GROUP_WAIT_TIME = 5000;/**< Max waiting time for response from EventGroup functions.*/
     static constexpr auto TOPIC_BASE = "iot/weather/";/**<Topic used for message recognition.*/
     static constexpr int QOS = 1;/**<Level of message's Quality Of Service.*/
-    const char *m_device_id;
-    static constexpr uint8_t MAC_ADDRESS_SIZE = 6;
-    static constexpr uint8_t TOPIC_SIZE = 40;
+    const char *m_device_id;/**<Identifier of the device e.g. ESP32-C6.*/
+    static constexpr uint8_t MAC_ADDRESS_SIZE = 6;/**<Size of the array containing MAC address.*/
+    static constexpr uint8_t TOPIC_SIZE = 40;/**<Size of the topic used during publishing.*/
 
     /**
      * @brief Event handler for version 5 mqtt protocol.
@@ -50,8 +50,12 @@ private:
     static void mqtt5_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
     /**
+     * @brief Generates topic used during message publishing.
      *
-     * @return
+     * It contains TOPIC_BASE and unique device identifier - Wi-Fi MAC address.
+     * It uses %s%s_%02X-%02X-%02X-%02X-%02X-%02X format.
+     *
+     * @return final topic used for message publishing.
      */
     std::string generate_topic();
 public:
