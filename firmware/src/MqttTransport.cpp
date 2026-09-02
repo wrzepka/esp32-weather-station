@@ -163,10 +163,10 @@ esp_err_t MqttTransport::publish(const std::string& serializedPayload) {
 }
 
 std::string MqttTransport::generate_topic() {
-    uint8_t mac_address[6];
+    uint8_t mac_address[MAC_ADDRESS_SIZE];
     esp_err_t status = esp_read_mac(mac_address, ESP_MAC_WIFI_STA);
 
-    char topic[64] = {}; //TODO: calc array size;
+    char topic[TOPIC_SIZE] = {};
 
     if (status == ESP_OK) {
         int result = snprintf(topic, sizeof(topic), "%s%s_%02X-%02X-%02X-%02X-%02X-%02X", TOPIC_BASE , m_device_id, mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);

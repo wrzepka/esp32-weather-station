@@ -34,6 +34,8 @@ private:
     static constexpr auto TOPIC_BASE = "iot/weather/";/**<Topic used for message recognition.*/
     static constexpr int QOS = 1;/**<Level of message's Quality Of Service.*/
     const char *m_device_id;
+    static constexpr uint8_t MAC_ADDRESS_SIZE = 6;
+    static constexpr uint8_t TOPIC_SIZE = 40;
 
     /**
      * @brief Event handler for version 5 mqtt protocol.
