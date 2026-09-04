@@ -33,7 +33,7 @@ A telemetry system based on the ESP32-C6 microcontroller. The system collects en
 ### Phase 3: Backend Layer (Java 21 / Spring Boot)
 - [x] Design PostgreSQL relational schema. 
 - [x] Configure Spring Integration MQTT inbound adapter.
-- [ ] Implement payload parsing and database insertion logic.
+- [x] Implement payload parsing and database insertion logic.
 
 ### Phase 4: Visualization (Grafana)
 - [ ] Connect Grafana directly to the PostgreSQL instance.
