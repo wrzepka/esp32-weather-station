@@ -4,9 +4,20 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
+/**
+ * Complex key used in weather telemetry records.
+ * It uses device identifier and datetime offset.
+ */
 public class WeatherTelemetryId implements Serializable {
 
+    /**
+     * Measurement timestamp SQL: TIMESTAMPTZ
+     */
     private OffsetDateTime dateTime;
+
+    /**
+     * Weather station identifier, downloaded from message topic: `DEVICECODE`_`MAC_ADDR`
+     */
     private String deviceId;
 
     public WeatherTelemetryId() {
