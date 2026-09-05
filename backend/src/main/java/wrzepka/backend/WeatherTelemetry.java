@@ -78,14 +78,6 @@ public class WeatherTelemetry {
         return lightIntensity;
     }
 
-    public void setDateTime(OffsetDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
-    }
-
     public void setPressure(Float pressure) {
         this.pressure = pressure;
     }
