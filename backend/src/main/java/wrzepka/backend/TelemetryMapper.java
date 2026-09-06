@@ -3,6 +3,7 @@ package wrzepka.backend;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 /**
  * Maps raw MQTT telemetry payload into the database entity representation.
@@ -20,9 +21,13 @@ public class TelemetryMapper {
      * @return populated {@link WeatherTelemetry} entity ready for persistence
      */
     public WeatherTelemetry toEntity(TelemetryPayload payload, String deviceId, OffsetDateTime dateTime){
-        final float divisor = 100.0f;
+        Objects.requireNonNull(payload, "Payload cannot be null");
+        Objects.requireNonNull(dateTime, "DateTime cannot be null");
+        if (deviceId == null || deviceId.isBlank()) {
+            throw new IllegalArgumentException("Device ID cannot be null or blank");
+        }
 
-        //TODO: handle nullish payload, device and dateTime?
+        final float divisor = 100.0f;
 
         Float pressure = scaleValue(payload.pressure(), divisor);
         Float temperature = scaleValue(payload.temperature(), divisor);
