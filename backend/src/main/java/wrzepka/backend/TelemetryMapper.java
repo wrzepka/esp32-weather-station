@@ -22,6 +22,8 @@ public class TelemetryMapper {
     public WeatherTelemetry toEntity(TelemetryPayload payload, String deviceId, OffsetDateTime dateTime){
         final float divisor = 100.0f;
 
+        //TODO: handle nullish payload, device and dateTime?
+
         Float pressure = scaleValue(payload.pressure(), divisor);
         Float temperature = scaleValue(payload.temperature(), divisor);
         Float humidity = scaleValue(payload.humidity(), divisor);
