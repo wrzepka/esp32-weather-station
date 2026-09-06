@@ -21,12 +21,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 
+/**
+ * Configuration of the MQTT v.5 protocol.
+ * It subscribes iot/weather/ topics from the broker and handles them by deserializing to the time series record.
+ *
+ * It takes device ID from the topic of the message and gets timestamp from the backend service.
+ */
 @Configuration
 public class MqttConfig {
 
+    /**
+     * Repository instance, used for saving newly handled message.
+     */
     private final WeatherTelemetryRepository repository;
+
+    /**
+     * ObjectMapper instance used for reading payload.
+     */
     private final ObjectMapper objectMapper;
+
+    /**
+     * Instance of the entity mapping object.
+     */
     private final TelemetryMapper telemetryMapper;
+
+    /**
+     * Logger object used for message logging.
+     */
     private final static Logger logger = LoggerFactory.getLogger(MqttConfig.class);
 
 
