@@ -51,10 +51,9 @@ public class MqttConfig {
     private final static Logger logger = LoggerFactory.getLogger(MqttConfig.class);
 
 
-    public MqttConfig(WeatherTelemetryRepository repository, TelemetryMapper telemetryMapper) {
+    public MqttConfig(WeatherTelemetryRepository repository, TelemetryMapper telemetryMapper, ObjectMapper objectMapper) {
         this.repository = repository;
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
         this.telemetryMapper = telemetryMapper;
     }
 
