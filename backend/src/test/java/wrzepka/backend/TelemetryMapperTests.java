@@ -88,4 +88,30 @@ public class TelemetryMapperTests {
         assertThat(telemetry.getPressure()).isCloseTo(1050.0f, within(0.01f));
         assertThat(telemetry.getTemperature()).isCloseTo(85.00f, within(0.01f));
     }
+
+    @Test
+    void shouldCorrectlyHandleOverflowMeasures(){
+        TelemetryPayload testPayload = new TelemetryPayload(65536L, 8600, 10001L, 110001L);
+
+        WeatherTelemetry telemetry = mapper.toEntity(testPayload, "TEST", OffsetDateTime.now());
+        assertThat(telemetry.getDeviceId()).isEqualTo("TEST");
+        assertThat(telemetry.getDateTime()).isNotNull();
+        assertThat(telemetry.getLightIntensity()).isNull();
+        assertThat(telemetry.getTemperature()).isNull();
+        assertThat(telemetry.getHumidity()).isNull();
+        assertThat(telemetry.getPressure()).isNull();
+    }
+
+    @Test
+    void shouldCorrectlyHandleUnderflowMeasures(){
+        TelemetryPayload testPayload = new TelemetryPayload(-1L, -4001, -1L, 29999L);
+
+        WeatherTelemetry telemetry = mapper.toEntity(testPayload, "TEST", OffsetDateTime.now());
+        assertThat(telemetry.getDeviceId()).isEqualTo("TEST");
+        assertThat(telemetry.getDateTime()).isNotNull();
+        assertThat(telemetry.getLightIntensity()).isNull();
+        assertThat(telemetry.getTemperature()).isNull();
+        assertThat(telemetry.getHumidity()).isNull();
+        assertThat(telemetry.getPressure()).isNull();
+    }
 }
