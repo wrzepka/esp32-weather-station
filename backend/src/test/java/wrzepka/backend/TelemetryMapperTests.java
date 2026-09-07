@@ -13,7 +13,7 @@ public class TelemetryMapperTests {
 
     @Test
     void shouldCorrectlyMapMinExtremeSensorValues() {
-        TelemetryPayload testPayload = new TelemetryPayload(0L, -4050, 0L, 95000L);
+        TelemetryPayload testPayload = new TelemetryPayload(0L, -4000, 0L, 95000L);
 
         WeatherTelemetry telemetry = mapper.toEntity(testPayload, "TEST", OffsetDateTime.now());
 
@@ -22,7 +22,7 @@ public class TelemetryMapperTests {
         assertThat(telemetry.getLightIntensity()).isEqualTo(0);
         assertThat(telemetry.getHumidity()).isCloseTo(0.0f, within(0.01f));
         assertThat(telemetry.getPressure()).isCloseTo(950.0f, within(0.01f));
-        assertThat(telemetry.getTemperature()).isCloseTo(-40.50f, within(0.01f));
+        assertThat(telemetry.getTemperature()).isCloseTo(-40.00f, within(0.01f));
     }
 
     @Test
