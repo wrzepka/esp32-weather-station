@@ -1,6 +1,7 @@
 package wrzepka.backend;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
  * @param pressure Absolute pressure in pascals.
  */
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record TelemetryPayload(
         Long lightIntensity,
         Integer temperature,
