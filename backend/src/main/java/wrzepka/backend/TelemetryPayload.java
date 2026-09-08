@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 /**
  * Record used for acquiring raw station measurements from MQTT protocol.
  * It takes light intensity, temperature, humidity and pressure.
+ * If payload contained additional keys, they will be ignored thanks to{@code @JsonIgnoreProperties(ignoreUnknown = true)}
  *
  * @param lightIntensity Light intensity in lx.
  * @param temperature Ambient temperature in Celsius.
