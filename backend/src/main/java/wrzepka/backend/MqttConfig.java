@@ -30,6 +30,11 @@ import java.time.OffsetDateTime;
 @Configuration
 public class MqttConfig {
 
+    public static final String MOSQUITTO_ADDRESS = "tcp://mosquitto:1883";
+    public static final String MQTT_CLIENT_ID = "spring-weather-consumer";
+    public static final String MQTT_TOPIC = "iot/weather/+";
+    public static final int QOS_VALUE = 1;
+    public static final int COMPLETION_TIMEOUT = 5000;
     /**
      * Repository instance, used for saving newly handled message.
      */
@@ -62,9 +67,9 @@ public class MqttConfig {
         MqttConnectionOptions options = new MqttConnectionOptions();
         options.setAutomaticReconnect(true);
         options.setCleanStart(true);
-        options.setServerURIs(new String[]{"tcp://mosquitto:1883"});
+        options.setServerURIs(new String[]{MOSQUITTO_ADDRESS});
 
-        return new Mqttv5ClientManager(options, "spring-weather-consumer");
+        return new Mqttv5ClientManager(options, MQTT_CLIENT_ID);
     }
 
     @Bean
@@ -76,11 +81,11 @@ public class MqttConfig {
     public MessageProducer inbound() {
         Mqttv5PahoMessageDrivenChannelAdapter adapter = new Mqttv5PahoMessageDrivenChannelAdapter(
                 mqttv5ClientManager(),
-                "iot/weather/+"
+                MQTT_TOPIC
         );
 
-        adapter.setCompletionTimeout(5000);
-        adapter.setQos(1);
+        adapter.setCompletionTimeout(COMPLETION_TIMEOUT);
+        adapter.setQos(QOS_VALUE);
         adapter.setOutputChannel(mqttInputChannel());
 
         return adapter;
