@@ -98,17 +98,7 @@ public class MqttConfig {
             @Override
             public void handleMessage(@NonNull Message<?> message) throws MessagingException {
                 String payload;
-                String topic = message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class);
-
-                if (topic == null || !topic.contains("/")){
-                    throw new IllegalArgumentException();
-                }
-
-                String deviceId = topic.substring(topic.lastIndexOf('/') + 1);
-
-                if (deviceId.isBlank()){
-                    throw new MessagingException("DeviceId in MQTT topic is blank");
-                }
+                String deviceId = getDeviceId(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class));
 
                 if (message.getPayload() instanceof byte[]) {
                     payload = new String((byte[]) message.getPayload());
@@ -129,5 +119,22 @@ public class MqttConfig {
                 }
             }
         };
+    }
+
+    private static String getDeviceId(String topic) {
+        if (topic == null) {
+            throw new IllegalArgumentException("Topic cannot be null");
+        }
+
+        int slashIndex = topic.lastIndexOf('/');
+        if (slashIndex == -1) {
+            throw new IllegalArgumentException("Invalid topic structure: " + topic);
+        }
+
+        String deviceId = topic.substring(slashIndex + 1);
+        if (deviceId.isBlank()) {
+            throw new IllegalArgumentException("Device ID cannot be blank in topic: " + topic);
+        }
+        return deviceId;
     }
 }
