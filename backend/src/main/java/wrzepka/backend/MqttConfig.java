@@ -98,7 +98,14 @@ public class MqttConfig {
             @Override
             public void handleMessage(@NonNull Message<?> message) throws MessagingException {
                 String payload;
-                String deviceId = getDeviceId(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class));
+                String deviceId;
+                try {
+                    deviceId = getDeviceId(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class));
+                } catch (IllegalArgumentException e){
+                    logger.error("Error during device id extraction", e);
+                    return;
+                }
+
 
                 if (message.getPayload() instanceof byte[]) {
                     payload = new String((byte[]) message.getPayload());
