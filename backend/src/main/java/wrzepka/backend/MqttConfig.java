@@ -109,6 +109,7 @@ public class MqttConfig {
                     telemetryIngestionService.saveTelemetry(telemetryPayload, deviceId, OffsetDateTime.now());
                 } catch (Exception e) {
                     logger.error("Error during message passing.", e);
+                    throw new MessagingException(message, "Message saving failed", e);
                 }
             }
         };
