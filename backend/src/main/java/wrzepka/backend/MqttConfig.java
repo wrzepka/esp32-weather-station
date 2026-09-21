@@ -24,7 +24,7 @@ import java.time.OffsetDateTime;
 /**
  * Configuration of the MQTT v.5 protocol.
  * It subscribes iot/weather/ topics from the broker and handles them by deserializing to the time series record.
- *
+ * <p>
  * It takes device ID from the topic of the message and gets timestamp from the backend service.
  */
 @Configuration
@@ -35,10 +35,6 @@ public class MqttConfig {
     public static final String MQTT_TOPIC = "iot/weather/+";
     public static final int QOS_VALUE = 1;
     public static final int COMPLETION_TIMEOUT = 5000;
-    /**
-     * Repository instance, used for saving newly handled message.
-     */
-    private final WeatherTelemetryRepository repository;
 
     /**
      * ObjectMapper instance used for reading payload.
@@ -46,20 +42,15 @@ public class MqttConfig {
     private final ObjectMapper objectMapper;
 
     /**
-     * Instance of the entity mapping object.
-     */
-    private final TelemetryMapper telemetryMapper;
-
-    /**
      * Logger object used for message logging.
      */
     private final static Logger logger = LoggerFactory.getLogger(MqttConfig.class);
 
+    private final TelemetryIngestionService telemetryIngestionService;
 
-    public MqttConfig(WeatherTelemetryRepository repository, TelemetryMapper telemetryMapper, ObjectMapper objectMapper) {
-        this.repository = repository;
+    public MqttConfig(ObjectMapper objectMapper, TelemetryIngestionService telemetryIngestionService) {
         this.objectMapper = objectMapper;
-        this.telemetryMapper = telemetryMapper;
+        this.telemetryIngestionService = telemetryIngestionService;
     }
 
     @Bean
@@ -101,7 +92,7 @@ public class MqttConfig {
                 String deviceId;
                 try {
                     deviceId = getDeviceId(message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC, String.class));
-                } catch (IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     logger.error("Error during device id extraction", e);
                     return;
                 }
@@ -115,12 +106,7 @@ public class MqttConfig {
 
                 try {
                     TelemetryPayload telemetryPayload = objectMapper.readValue(payload, TelemetryPayload.class);
-
-                    WeatherTelemetry weatherTelemetry = telemetryMapper.toEntity(telemetryPayload, deviceId, OffsetDateTime.now());
-
-                    repository.save(weatherTelemetry);
-                    logger.info("Telemetry saved from station: {}.", deviceId);
-
+                    telemetryIngestionService.saveTelemetry(telemetryPayload, deviceId, OffsetDateTime.now());
                 } catch (Exception e) {
                     logger.error("Error during message passing.", e);
                 }
