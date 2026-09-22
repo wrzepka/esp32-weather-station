@@ -5,10 +5,25 @@ import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 
+/**
+ * MQTT message ingestion service.
+ * It creates new WeatherTelemetry entity using {@code TelemetryMapper} and then saves it to the database via {@code WeatherTelemetryRepository}.
+ */
 public class TelemetryIngestionService {
+    /**
+     * Telemetry mapper object used for creating WeatherTelemetry entity.
+     */
     private final TelemetryMapper telemetryMapper;
+
+    /**
+     * Telemetry repository object used for saving newly ingested record.
+     */
     private final WeatherTelemetryRepository repository;
-    private final static Logger logger = LoggerFactory.getLogger(TelemetryIngestionService.class);
+
+    /**
+     * Logger object used for message logging.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(TelemetryIngestionService.class);
 
     public TelemetryIngestionService(TelemetryMapper telemetryMapper, WeatherTelemetryRepository repository) {
         this.telemetryMapper = telemetryMapper;
