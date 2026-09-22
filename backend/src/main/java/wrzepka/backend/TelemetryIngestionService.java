@@ -1,7 +1,9 @@
 package wrzepka.backend;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
@@ -9,6 +11,8 @@ import java.time.OffsetDateTime;
  * MQTT message ingestion service.
  * It creates new WeatherTelemetry entity using {@code TelemetryMapper} and then saves it to the database via {@code WeatherTelemetryRepository}.
  */
+@Service
+@Transactional
 public class TelemetryIngestionService {
     /**
      * Telemetry mapper object used for creating WeatherTelemetry entity.
