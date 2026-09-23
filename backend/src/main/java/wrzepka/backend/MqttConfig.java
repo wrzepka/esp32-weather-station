@@ -35,17 +35,8 @@ public class MqttConfig {
     public static final String MQTT_TOPIC = "iot/weather/+";
     public static final int QOS_VALUE = 1;
     public static final int COMPLETION_TIMEOUT = 5000;
-
-    /**
-     * ObjectMapper instance used for reading payload.
-     */
     private final ObjectMapper objectMapper;
-
-    /**
-     * Logger object used for message logging.
-     */
     private final static Logger logger = LoggerFactory.getLogger(MqttConfig.class);
-
     private final TelemetryIngestionService telemetryIngestionService;
 
     public MqttConfig(ObjectMapper objectMapper, TelemetryIngestionService telemetryIngestionService) {

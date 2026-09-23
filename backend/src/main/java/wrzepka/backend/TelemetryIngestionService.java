@@ -14,19 +14,9 @@ import java.time.OffsetDateTime;
 @Service
 @Transactional
 public class TelemetryIngestionService {
-    /**
-     * Telemetry mapper object used for creating WeatherTelemetry entity.
-     */
+
     private final TelemetryMapper telemetryMapper;
-
-    /**
-     * Telemetry repository object used for saving newly ingested record.
-     */
     private final WeatherTelemetryRepository repository;
-
-    /**
-     * Logger object used for message logging.
-     */
     private static final Logger logger = LoggerFactory.getLogger(TelemetryIngestionService.class);
 
     public TelemetryIngestionService(TelemetryMapper telemetryMapper, WeatherTelemetryRepository repository) {
