@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
  * It creates new WeatherTelemetry entity using {@code TelemetryMapper} and then saves it to the database via {@code WeatherTelemetryRepository}.
  */
 @Service
-@Transactional
 public class TelemetryIngestionService {
 
     private final TelemetryMapper telemetryMapper;
@@ -36,6 +35,6 @@ public class TelemetryIngestionService {
         WeatherTelemetry weatherTelemetry = telemetryMapper.toEntity(payload, deviceId, time);
 
         repository.save(weatherTelemetry);
-        logger.info("Telemetry saved from station: {}.", deviceId);
+        logger.debug("Telemetry saved from station: {}.", deviceId);
     }
 }
